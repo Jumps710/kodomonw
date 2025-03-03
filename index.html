@@ -1,762 +1,115 @@
-﻿
-    <!DOCTYPE html>
-    <html lang="ja">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>寄付報告</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
-        h2 { color: #333; }
-        .tweet-embed { margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-      </style>
-    </head>
-    <body>
-      <h1>寄付報告</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE寄付アプリ</title>
+    <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
+</head>
+<body>
+    <h2>LINE寄付アプリ</h2>
+    <div id="loginStatus">Loading...</div>
+    <div id="userInfo" style="display: none;">
+        <p><strong>LINEニックネーム:</strong> <span id="nickname"></span></p>
+        <p><strong>拠点:</strong> <select id="siteSelect"></select></p>
+        <button id="registerBtn">登録</button>
+    </div>
+    
+    <div id="donationForm" style="display: none;">
+        <h3>寄付登録</h3>
+        <label>品名: <input type="text" id="itemName"></label><br>
+        <label>寄付元: <input type="text" id="donor"></label><br>
+        <label>メッセージ: <input type="text" id="message"></label><br>
+        <label>画像: <input type="file" id="image"></label><br>
+        <button id="submitDonation">寄付を登録</button>
+    </div>
 
-      <h2>最近のご寄付</h2>
-      <div class="recent-donations">
-        
-          <div class="tweet-embed">
-            <blockquote class="twitter-tweet">
-              <a href="https://twitter.com/undefined/status/1895424350745972858"></a>
-            </blockquote>
-          </div>
-          <div class="tweet-embed">
-            <blockquote class="twitter-tweet">
-              <a href="https://twitter.com/undefined/status/1895398266813944153"></a>
-            </blockquote>
-          </div>
-          <div class="tweet-embed">
-            <blockquote class="twitter-tweet">
-              <a href="https://twitter.com/undefined/status/1895393447831363929"></a>
-            </blockquote>
-          </div>
-          <div class="tweet-embed">
-            <blockquote class="twitter-tweet">
-              <a href="https://twitter.com/undefined/status/1892886036167987220"></a>
-            </blockquote>
-          </div>
-          <div class="tweet-embed">
-            <blockquote class="twitter-tweet">
-              <a href="https://twitter.com/undefined/status/1892882215627001899"></a>
-            </blockquote>
-          </div>
-      </div>
+    <script>
+        const LIFF_ID = "YOUR_LIFF_ID"; // LIFF IDを設定
+        const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzgGPEPg4IswLPfG67IncPEsGeV2ZWE7QT21vzYFcXLOqrnLmYk79PMvekDRS0hbQsT/exec";
+        let userId, displayName;
 
-      <h2>これまでのご寄付</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>日時</th>
-            <th>寄付者</th>
-            <th>重さ</th>
-            <th>寄付内容</th>
-            <th>リンク</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            <tr>
-              <td>2025年02月21日</td>
-              <td>シャポーむすぶば様</td>
-              <td>137kg</td>
-              <td>ジュース、レトルト、乾麺、調味料</td>
-              <td><a href="https://twitter.com/undefined/status/1892880573292494852" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月21日</td>
-              <td>コープ市川店様</td>
-              <td>425kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1892879936349704622" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月16日</td>
-              <td>コープみらい様</td>
-              <td>3kg</td>
-              <td>使い捨て手袋、エコバッグ</td>
-              <td><a href="https://twitter.com/undefined/status/1891030419467907460" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月16日</td>
-              <td>コープみらい様</td>
-              <td>18.5kg</td>
-              <td>レトルトカレー、小麦粉、調味料他</td>
-              <td><a href="https://twitter.com/undefined/status/1891027261974794662" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月16日</td>
-              <td>きやっせフードドライブ様</td>
-              <td>6kg</td>
-              <td>レトルト食品、お菓子、缶詰め他</td>
-              <td><a href="https://twitter.com/undefined/status/1891024603591406051" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月15日</td>
-              <td>コープ市川店様</td>
-              <td>22.45kg</td>
-              <td>調味料、お菓子、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1890674462447567189" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月15日</td>
-              <td>KeiyoGAS Community Terrace（てらす）様</td>
-              <td>3kg</td>
-              <td>オムツ、インスタント、乾麺</td>
-              <td><a href="https://twitter.com/undefined/status/1890668591638303177" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月09日</td>
-              <td>コープ市川店様</td>
-              <td>15kg</td>
-              <td>お米、調味料、お菓子</td>
-              <td><a href="https://twitter.com/undefined/status/1888479653544833301" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月09日</td>
-              <td>シャポーむすぶば様</td>
-              <td>3.05kg</td>
-              <td>調味料、お菓子、</td>
-              <td><a href="https://twitter.com/undefined/status/1888479141336580309" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月06日</td>
-              <td>船橋湾岸センター様</td>
-              <td>71.45kg</td>
-              <td>パン、お菓子</td>
-              <td><a href="https://twitter.com/undefined/status/1887401290918986056" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月06日</td>
-              <td>個人の皆様</td>
-              <td>4.6kg</td>
-              <td>レトルト、カロリーメイト</td>
-              <td><a href="https://twitter.com/undefined/status/1887364591719514313" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月06日</td>
-              <td>シャポーむすぶば様</td>
-              <td>17.35kg</td>
-              <td>お菓子、レトルト、乾麺など</td>
-              <td><a href="https://twitter.com/undefined/status/1887293262156726539" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月06日</td>
-              <td>コープ市川店様</td>
-              <td>10.75kg</td>
-              <td>お菓子、乾麺など</td>
-              <td><a href="https://twitter.com/undefined/status/1887292776989212716" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年02月04日</td>
-              <td>JA全農 酪農部様</td>
-              <td>630kg</td>
-              <td>わたぼく牛乳&コーヒーミルク</td>
-              <td><a href="https://twitter.com/undefined/status/1886782312576377306" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月26日</td>
-              <td>コープ市川店様</td>
-              <td>270kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1883416417032179880" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月26日</td>
-              <td>コープ市川店様</td>
-              <td>307.8kg</td>
-              <td>お菓子、お米、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1883414956529315933" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月25日</td>
-              <td>コープ市川店様</td>
-              <td>9.25kg</td>
-              <td>レトルト、お菓子、おもち</td>
-              <td><a href="https://twitter.com/undefined/status/1883097823585190014" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月25日</td>
-              <td>KeiyoGAS Community Terrace（てらす）様</td>
-              <td>8.45kg</td>
-              <td>お菓子、レトルトなど</td>
-              <td><a href="https://twitter.com/undefined/status/1883095799678022017" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月25日</td>
-              <td>個人の皆様</td>
-              <td>1kg</td>
-              <td>ナッツ</td>
-              <td><a href="https://twitter.com/undefined/status/1883094021712609681" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月12日</td>
-              <td>コープ市川店様</td>
-              <td>47.25kg</td>
-              <td>お菓子、レトルト、乾麺、缶詰</td>
-              <td><a href="https://twitter.com/undefined/status/1878264614833520825" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月12日</td>
-              <td>シャポーむすぶば様</td>
-              <td>19.1kg</td>
-              <td>お菓子、調味料、カップ麺、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1878263613997166874" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月09日</td>
-              <td>船橋湾岸センター様</td>
-              <td>99.85kg</td>
-              <td>お菓子</td>
-              <td><a href="https://twitter.com/undefined/status/1877149864561156248" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月09日</td>
-              <td>コープ市川店様</td>
-              <td>24.25kg</td>
-              <td>お米、お菓子、レトルト、調味料</td>
-              <td><a href="https://twitter.com/undefined/status/1877149340944187586" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2025年01月09日</td>
-              <td>個人の皆様</td>
-              <td>43.15kg</td>
-              <td>カップ麺、お菓子、飲料、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1877148379844579808" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月23日</td>
-              <td>パルシステム様様</td>
-              <td>80.35kg</td>
-              <td>レトルト、飲料、お菓子</td>
-              <td><a href="https://twitter.com/undefined/status/1871182307966783805" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月23日</td>
-              <td>船橋湾岸センター様</td>
-              <td>24.6kg</td>
-              <td>パンケーキミックス</td>
-              <td><a href="https://twitter.com/undefined/status/1871176997411459213" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月22日</td>
-              <td>市川フロンティアローズシニアライオンズクラブ様</td>
-              <td>20kgkg</td>
-              <td>海軍カレー100食(50kg)</td>
-              <td><a href="https://twitter.com/undefined/status/1870674137967976516" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月22日</td>
-              <td>極東証券様</td>
-              <td>27kg</td>
-              <td>レトルト、インスタント食品、乾麺、お菓子等</td>
-              <td><a href="https://twitter.com/undefined/status/1870650469162344672" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月22日</td>
-              <td>個人の皆様</td>
-              <td>13.5kg</td>
-              <td>お米、インスタントコーヒー等</td>
-              <td><a href="https://twitter.com/undefined/status/1870648817978122474" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月22日</td>
-              <td>シャポーむすぶば様</td>
-              <td>35.75kg</td>
-              <td>お菓子、離乳食、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1870644416265748529" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月22日</td>
-              <td>コープ市川店様</td>
-              <td>363.1kg</td>
-              <td>レトルト、お菓子、調味料、カップ麺、米</td>
-              <td><a href="https://twitter.com/undefined/status/1870643654986969393" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月17日</td>
-              <td>KeiyoGAS Community Terrace（てらす）様</td>
-              <td>15.2kg</td>
-              <td>飲料、サプリ、乾麺、調味料</td>
-              <td><a href="https://twitter.com/undefined/status/1868945155459629499" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月17日</td>
-              <td>コープ市川店様</td>
-              <td>12.8kg</td>
-              <td>お菓子。乾麺、飲料、</td>
-              <td><a href="https://twitter.com/undefined/status/1868944674439754211" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月17日</td>
-              <td>個人の皆様</td>
-              <td>1kg</td>
-              <td>缶詰</td>
-              <td><a href="https://twitter.com/undefined/status/1868944169156100386" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月15日</td>
-              <td>京成線フードドライブ様</td>
-              <td>140.64kg</td>
-              <td>レトルト、お菓子、飲料、乾麺</td>
-              <td><a href="https://twitter.com/undefined/status/1868221267280613804" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月14日</td>
-              <td>個人の皆様</td>
-              <td>13.5kg</td>
-              <td>お菓子</td>
-              <td><a href="https://twitter.com/undefined/status/1867788708818153899" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月14日</td>
-              <td>個人の皆様</td>
-              <td>1kg</td>
-              <td>レトルト牛丼</td>
-              <td><a href="https://twitter.com/undefined/status/1867715533115707841" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月12日</td>
-              <td>個人の皆様</td>
-              <td>6.6kg</td>
-              <td>レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1867001378545062271" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月12日</td>
-              <td>明治HD様様</td>
-              <td>53.45kg</td>
-              <td>お菓子、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1866999975084954055" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月12日</td>
-              <td>個人様</td>
-              <td>11.75kg</td>
-              <td>レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1866996724188741984" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月10日</td>
-              <td>コープ市川店様</td>
-              <td>340.5kg</td>
-              <td>お菓子、お米、缶詰、レトルト、調味料</td>
-              <td><a href="https://twitter.com/undefined/status/1866400855940857989" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年12月08日</td>
-              <td>シャポーむすぶば様</td>
-              <td>22.8kg</td>
-              <td>お菓子、レトルト、</td>
-              <td><a href="https://twitter.com/undefined/status/1865573985229885928" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月30日</td>
-              <td>コープ市川店様</td>
-              <td>25.8kg</td>
-              <td>お菓子、缶詰、レトルト、飲料、調味料</td>
-              <td><a href="https://twitter.com/undefined/status/1862783025966358707" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月30日</td>
-              <td>京葉ガスてらす様</td>
-              <td>15.1kg</td>
-              <td>缶詰、お菓子、レトルト、調味料</td>
-              <td><a href="https://twitter.com/undefined/status/1862782186434212222" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月30日</td>
-              <td>船橋湾岸センター様</td>
-              <td>118.25kg</td>
-              <td>お菓子、パン</td>
-              <td><a href="https://twitter.com/undefined/status/1862781724536479970" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月17日</td>
-              <td>個人の皆様</td>
-              <td>0.6kg</td>
-              <td>缶詰</td>
-              <td><a href="https://twitter.com/undefined/status/1858100413376971247" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月17日</td>
-              <td>シャポーむすぶば様</td>
-              <td>7.35kg</td>
-              <td>レトルト、お菓子、</td>
-              <td><a href="https://twitter.com/undefined/status/1857950744525111589" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月17日</td>
-              <td>コープ市川店様</td>
-              <td>510.95kg</td>
-              <td>お菓子、お米、缶、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1857950353007784364" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月12日</td>
-              <td>ガールスカウト第52団様</td>
-              <td>20.55kg</td>
-              <td>お米、お菓子、缶詰、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1856297848121299289" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月03日</td>
-              <td>シャポーむすぶば様</td>
-              <td>13.3kg</td>
-              <td>お菓子、レトルト、カップ麺</td>
-              <td><a href="https://twitter.com/undefined/status/1852876571486384334" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年11月03日</td>
-              <td>コープ市川店様</td>
-              <td>315.1kg</td>
-              <td>お米、レトルト、缶詰、お菓子、カップ麺</td>
-              <td><a href="https://twitter.com/undefined/status/1852869966476824760" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月28日</td>
-              <td>湾岸船橋センター様</td>
-              <td>83.15kg</td>
-              <td>お菓子、ぱん</td>
-              <td><a href="https://twitter.com/undefined/status/1850835821844115568" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月28日</td>
-              <td>コープ市川店様</td>
-              <td>5.75kg</td>
-              <td>お菓子、乾麺、飲料</td>
-              <td><a href="https://twitter.com/undefined/status/1850815301216079930" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月19日</td>
-              <td>コープ市川店様</td>
-              <td>14.35kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1847429475861979154" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月19日</td>
-              <td>シャポーむすぶば様</td>
-              <td>12.15kg</td>
-              <td>お菓子、乾麺、飲料、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1847423588581999055" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月19日</td>
-              <td>コープ市川店様</td>
-              <td>14.8kg</td>
-              <td>調味料、乾麺、お菓子、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1847415635904463080" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月13日</td>
-              <td>Jumps様</td>
-              <td>1kg</td>
-              <td>Test</td>
-              <td><a href="https://twitter.com/undefined/status/1845273359048900828" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月13日</td>
-              <td>Jumos様</td>
-              <td>1kg</td>
-              <td>Tedt</td>
-              <td><a href="https://twitter.com/undefined/status/1845270797495017857" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月08日</td>
-              <td>フードドライブin国府台様</td>
-              <td>13.8kg</td>
-              <td>乾麺、飲料、缶詰</td>
-              <td><a href="https://twitter.com/undefined/status/1843569554758189538" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月08日</td>
-              <td>コープ市川店様</td>
-              <td>24.5kg</td>
-              <td>乾麺、お菓子、調味料、お米</td>
-              <td><a href="https://twitter.com/undefined/status/1843568060889813240" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月08日</td>
-              <td>シャポーむすぶば様</td>
-              <td>20.1kg</td>
-              <td>お菓子、レトルト、乾麺、缶詰</td>
-              <td><a href="https://twitter.com/undefined/status/1843566904780214558" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月02日</td>
-              <td>湾岸船橋センター様</td>
-              <td>136.75kg</td>
-              <td>パン、お菓子</td>
-              <td><a href="https://twitter.com/undefined/status/1841401731856699728" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年10月01日</td>
-              <td>テスト様</td>
-              <td>10kg</td>
-              <td>テスト</td>
-              <td><a href="https://twitter.com/undefined/status/1840964232977781080" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月30日</td>
-              <td>京葉ガスてらす様</td>
-              <td>12.6kg</td>
-              <td>お菓子、乾麺、のり</td>
-              <td><a href="https://twitter.com/undefined/status/1840678670366630324" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月30日</td>
-              <td>コープ市川店様</td>
-              <td>16.9kg</td>
-              <td>缶詰、お米、お菓子、カップ麺</td>
-              <td><a href="https://twitter.com/undefined/status/1840669461310853286" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月21日</td>
-              <td>コープ市川店様</td>
-              <td>11.95kg</td>
-              <td>ラーメン、お菓子、飲料水、レトルト</td>
-              <td><a href="https://twitter.com/undefined/status/1837327795527225715" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月21日</td>
-              <td>シャポーむすぶば様</td>
-              <td>9.75kg</td>
-              <td>缶詰、お菓子、離乳食</td>
-              <td><a href="https://twitter.com/undefined/status/1837326790517195017" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月21日</td>
-              <td>コープ市川大野様</td>
-              <td>300kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1837325707422355603" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月15日</td>
-              <td>シャポーむすぶば様</td>
-              <td>14.5kg</td>
-              <td>お米、レトルト、おかし、缶詰</td>
-              <td><a href="https://twitter.com/undefined/status/1835172379921654244" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月15日</td>
-              <td>コープ市川店様</td>
-              <td>11.9ｋｇkg</td>
-              <td>カップ麺、お菓子、レトルト、お米</td>
-              <td><a href="https://twitter.com/undefined/status/1835164229894287674" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月13日</td>
-              <td>大野コープセンター様</td>
-              <td>300kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1834495742028792299" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月13日</td>
-              <td>テスト様</td>
-              <td>2kg</td>
-              <td>テスト</td>
-              <td><a href="https://twitter.com/undefined/status/1834495089818685704" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月13日</td>
-              <td>大野コープセンター様様</td>
-              <td>300kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1834478881677402157" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月13日</td>
-              <td>その他様</td>
-              <td>300kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1834476026375901694" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月12日</td>
-              <td>その他様</td>
-              <td>300kg</td>
-              <td>お米</td>
-              <td><a href="https://twitter.com/undefined/status/1834047361334579358" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月12日</td>
-              <td>京葉ガスてらす様</td>
-              <td>6.15kg</td>
-              <td>乾物、飲料、おもちなど</td>
-              <td><a href="https://twitter.com/undefined/status/1834046398741762351" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月12日</td>
-              <td>コープ市川店様</td>
-              <td>28.84kg</td>
-              <td>即席麺、調味料、飲料</td>
-              <td><a href="https://twitter.com/undefined/status/1834044873848115547" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年09月05日</td>
-              <td>市川市こども施策課様</td>
-              <td>97kg</td>
-              <td>米90キロ、ポン酢醤油40本</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1831694727663513822" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月31日</td>
-              <td>湾岸船橋センター様</td>
-              <td>11.7kg</td>
-              <td>お菓子</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1829758191313309777" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月31日</td>
-              <td>湾岸船橋センター様</td>
-              <td>102.55kg</td>
-              <td>お菓子</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1829724357976825910" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月31日</td>
-              <td>湾岸船橋センター様</td>
-              <td>42.4kg</td>
-              <td>クロワッサン</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1829724085275767232" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月26日</td>
-              <td>シャポー市川　フードドライブ様</td>
-              <td>46.3kg</td>
-              <td>飲料、缶詰、瓶詰、即席麺など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1827977824055009458" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月26日</td>
-              <td>コープ市川店様</td>
-              <td>52kg</td>
-              <td>調味料、乾物、お菓子など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1827977149996814687" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月09日</td>
-              <td>コープ市川店様</td>
-              <td>17.6kg</td>
-              <td>レトルト、お茶、乾麺、調味料、菓子</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1821849661881098296" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月09日</td>
-              <td>シャポー市川様</td>
-              <td>16.35kg</td>
-              <td>即席麺、調味料、缶詰、お菓子など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1821848545877516639" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月08日</td>
-              <td>船橋フードバンク様</td>
-              <td>320.25kg</td>
-              <td>レトルトカレー、即席麺、野菜ジュース、ゼリーなど</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1821353748230279401" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月08日</td>
-              <td>シャポー市川様</td>
-              <td>110.5kg</td>
-              <td>フードドライブイベント</td>
-              <td><a href="https://x.com/fbichikawa1" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年08月03日</td>
-              <td>コープ市川店様</td>
-              <td>13.4kg</td>
-              <td>乾麺、調味料、米、菓子など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1819675837148369164" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月27日</td>
-              <td>コープ湾岸センター様</td>
-              <td>100.55kg</td>
-              <td>お菓子、パン</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1817085673075036447" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月27日</td>
-              <td>コープ市川店様</td>
-              <td>24kg</td>
-              <td>インスタント食品、お菓子等</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1817085075810353502" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月27日</td>
-              <td>京葉ガスてらす様</td>
-              <td>4.5kg</td>
-              <td>レトルト、調味料、お菓子等</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1817084758960316426" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月27日</td>
-              <td>アサヒグループ様</td>
-              <td>62kg</td>
-              <td>赤ちゃんのおしりふき</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1817072054858105046" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月20日</td>
-              <td>パラマウントベッド様</td>
-              <td>71kg</td>
-              <td>レトルト白ごはん</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1814505083876614239" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月20日</td>
-              <td>コープ市川店様</td>
-              <td>36.3kg</td>
-              <td>おかず類、お菓子等</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1814504182897934649" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月12日</td>
-              <td>コープ市川店様</td>
-              <td>17.75kg</td>
-              <td>乾麺、飲料、お菓子、調味料など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1811727677868638304" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月11日</td>
-              <td>コープ市川店様</td>
-              <td>26.4kg</td>
-              <td>調味料、パスタ、インスタント、缶詰、飲料など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1811269889094570209" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年07月10日</td>
-              <td>明治ホールディングス株式会社様</td>
-              <td>70kg</td>
-              <td>レトルトカレー</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1810831397042671909" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年06月29日</td>
-              <td>船橋湾岸センターWeed様</td>
-              <td>77.95kg</td>
-              <td>デニッシュあんぱん、菓子など</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1806933022060552580" target="_blank">詳細</a></td>
-            </tr>
-            <tr>
-              <td>2024年06月29日</td>
-              <td>コープ市川店様</td>
-              <td>3.55kg</td>
-              <td>餅、カップ麺、味噌、飲料、菓子等</td>
-              <td><a href="https://twitter.com/ichikawafoodbank/status/1806929720912572570" target="_blank">詳細</a></td>
-            </tr>
-        </tbody>
-      </table>
+        async function initLIFF() {
+            await liff.init({ liffId: LIFF_ID });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+            const profile = await liff.getProfile();
+            userId = profile.userId;
+            displayName = profile.displayName;
+            document.getElementById("nickname").textContent = displayName;
 
-      <script async src="https://platform.twitter.com/widgets.js"></script>
-    </body>
-    </html>
-  
+            checkUserRegistration(userId);
+        }
+
+        async function checkUserRegistration(userId) {
+            const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
+            const result = await response.json();
+
+            if (result.exists) {
+                showDonationForm();
+            } else {
+                loadSiteOptions();
+                document.getElementById("userInfo").style.display = "block";
+            }
+        }
+
+        async function loadSiteOptions() {
+            const response = await fetch(`${BACKEND_URL}?action=getSites`);
+            const sites = await response.json();
+            const select = document.getElementById("siteSelect");
+
+            sites.forEach(site => {
+                let option = document.createElement("option");
+                option.value = site;
+                option.textContent = site;
+                select.appendChild(option);
+            });
+        }
+
+        async function registerUser() {
+            const siteName = document.getElementById("siteSelect").value;
+            await fetch(`${BACKEND_URL}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "registerUser",
+                    userId: userId,
+                    nickname: displayName,
+                    siteName: siteName
+                })
+            });
+            showDonationForm();
+        }
+
+        function showDonationForm() {
+            document.getElementById("userInfo").style.display = "none";
+            document.getElementById("donationForm").style.display = "block";
+        }
+
+        async function submitDonation() {
+            const itemName = document.getElementById("itemName").value;
+            const donor = document.getElementById("donor").value;
+            const message = document.getElementById("message").value;
+            const imageFile = document.getElementById("image").files[0];
+
+            const formData = new FormData();
+            formData.append("action", "submitDonation");
+            formData.append("userId", userId);
+            formData.append("itemName", itemName);
+            formData.append("donor", donor);
+            formData.append("message", message);
+            formData.append("image", imageFile);
+
+            await fetch(`${BACKEND_URL}`, { method: "POST", body: formData });
+            alert("寄付を登録しました！");
+        }
+
+        document.getElementById("registerBtn").addEventListener("click", registerUser);
+        document.getElementById("submitDonation").addEventListener("click", submitDonation);
+
+        initLIFF();
+    </script>
+</body>
+</html>
