@@ -9,21 +9,6 @@ body {
     padding: 20px;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-#loading {
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-/* モバイル画面いっぱいにフォームを使う */
 form {
     width: 90%;
     max-width: 600px;
@@ -32,6 +17,22 @@ form {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* タイトル（フォームと同じレイヤーにする） */
+h1 {
+    text-align: left;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* ローディングテキスト */
+#loading {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
 }
 
 /* フォーム要素間の間隔 */
@@ -61,7 +62,7 @@ textarea {
 
 textarea {
     resize: none;
-    height: 100px; /* メッセージの入力エリアを広く */
+    height: 100px;
 }
 
 input:focus,
