@@ -45,7 +45,7 @@
                 const result = await response.json();
 
                 if (result.exists) {
-                    // 既存登録済みなら、form.html にリダイレクト
+                    // 既存登録済みなら `form.html` にリダイレクト
                     window.location.href = `form.html?userId=${userId}`;
                 } else {
                     // 未登録なら拠点登録画面を表示
@@ -96,6 +96,7 @@
 
                 if (result.success) {
                     alert("登録が完了しました！");
+                    // ✅ ここでリダイレクトのみを実行
                     window.location.href = `form.html?userId=${userId}`;
                 } else {
                     alert("登録に失敗しました: " + JSON.stringify(result));
