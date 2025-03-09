@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LINE寄付アプリ</title>
     <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
+    <!-- vConsoleのスクリプトを追加 -->
+<script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+<script>
+    var vConsole = new VConsole();
+    console.log("vConsoleが起動しました");
+</script>
+
 </head>
 <body>
     <h2>LINE寄付アプリ</h2>
@@ -79,6 +86,7 @@ async function registerUser() {
     }
 
     try {
+        console.log("APIリクエスト送信前");
         const response = await fetch(`${BACKEND_URL}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -90,6 +98,7 @@ async function registerUser() {
             })
         });
 
+        console.log("APIリクエスト送信完了", response);
         const result = await response.json();
         console.log("サーバー応答:", result);
 
@@ -101,9 +110,10 @@ async function registerUser() {
         }
     } catch (error) {
         console.error("エラー:", error);
-        alert("エラーが発生しました");
+        alert("エラーが発生しました：" + error);
     }
 }
+
 
 
         function showDonationForm() {
