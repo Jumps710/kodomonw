@@ -68,20 +68,43 @@
             });
         }
 
-        async function registerUser() {
-            const siteName = document.getElementById("siteSelect").value;
-            await fetch(`${BACKEND_URL}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "registerUser",
-                    userId: userId,
-                    nickname: displayName,
-                    siteName: siteName
-                })
-            });
+async function registerUser() {
+    const siteName = document.getElementById("siteSelect").value;
+    console.log("登録ボタンが押されました");
+    console.log("選択された拠点:", siteName);
+    
+    if (!siteName) {
+        alert("拠点を選択してください");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BACKEND_URL}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "registerUser",
+                userId: userId,
+                nickname: displayName,
+                siteName: siteName
+            })
+        });
+
+        const result = await response.json();
+        console.log("サーバー応答:", result);
+
+        if (result.success) {
+            alert("登録が完了しました！");
             showDonationForm();
+        } else {
+            alert("登録に失敗しました");
         }
+    } catch (error) {
+        console.error("エラー:", error);
+        alert("エラーが発生しました");
+    }
+}
+
 
         function showDonationForm() {
             document.getElementById("userInfo").style.display = "none";
