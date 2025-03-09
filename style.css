@@ -9,7 +9,7 @@ body {
     padding: 20px;
 }
 
-/* フォームを画面幅いっぱいに広げる */
+/* フォーム全体を画面幅いっぱいに */
 form {
     width: 100%;
     max-width: 100%;
@@ -49,7 +49,15 @@ label {
     margin-bottom: 8px;
 }
 
-/* 入力フィールドを統一 */
+/* LINEニックネームの表示 */
+.nickname-display {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+/* 入力フィールドの統一 */
 input[type="text"],
 select {
     width: 100%;
@@ -61,43 +69,11 @@ select {
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-input:focus,
-select:focus {
-    border-color: #4285f4;
-    box-shadow: 0 0 5px rgba(66, 133, 244, 0.3);
-    outline: none;
-}
-
-/* ファイルアップロード */
-.file-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: #f9f9f9;
-    padding: 12px;
-}
-
-.file-group input[type="file"] {
-    display: none;
-}
-
-.file-group label.custom-file-label {
-    background-color: #4285f4;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.file-name {
-    font-size: 18px;
-    color: #555;
-    flex-grow: 1;
-    text-align: center;
+/* プルダウンのサイズを他と統一 */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 /* ボタン */
@@ -122,14 +98,5 @@ button {
 }
 
 #registerBtn:hover {
-    background-color: #3e8e41;
-}
-
-#submitDonation {
-    background-color: #4CAF50;
-    color: white;
-}
-
-#submitDonation:hover {
     background-color: #3e8e41;
 }
