@@ -114,7 +114,7 @@
             }
         }
 
-      async function registerUser() {
+async function registerUser() {
     const siteName = document.getElementById("siteSelect").value;
 
     if (!siteName) {
@@ -141,7 +141,7 @@
             throw new Error(`サーバーエラー: ${response.status} ${response.statusText}`);
         }
 
-        const text = await response.text(); // JSON 形式ではないレスポンスも考慮
+        const text = await response.text();
         console.log("サーバーからのレスポンス:", text);
 
         let result;
@@ -163,6 +163,7 @@
         alert("サーバー通信に失敗しました: " + error.message);
     }
 }
+
 
 
         document.getElementById("registerBtn").addEventListener("click", registerUser);
