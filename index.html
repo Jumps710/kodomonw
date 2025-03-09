@@ -114,48 +114,56 @@
             }
         }
 
-        async function registerUser() {
-            const siteName = document.getElementById("siteSelect").value;
-            
-            if (!siteName) {
-                alert("拠点を選択してください");
-                return;
-            }
+      async function registerUser() {
+    const siteName = document.getElementById("siteSelect").value;
 
-            try {
-                console.log(`ユーザー登録開始: userId=${userId}, siteName=${siteName}`);
+    if (!siteName) {
+        alert("拠点を選択してください");
+        return;
+    }
 
-                const response = await fetch(BACKEND_URL, {
-                    method: "POST",
-                    mode: "cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify({
-                        action: "registerUser",
-                        userId: userId,
-                        nickname: displayName,
-                        siteName: siteName
-                    })
-                });
+    try {
+        console.log(`ユーザー登録開始: userId=${userId}, siteName=${siteName}`);
 
-                if (!response.ok) {
-                    throw new Error("サーバーエラー");
-                }
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "registerUser",
+                userId: userId,
+                nickname: displayName,
+                siteName: siteName
+            })
+        });
 
-                const result = await response.json();
-                console.log(`ユーザー登録結果: ${JSON.stringify(result)}`);
-
-                if (result.success) {
-                    alert("ユーザ登録が成功しました");
-                    console.log("フォームページへリダイレクト");
-                    window.location.href = `form.html?userId=${userId}`;
-                } else {
-                    alert("登録に失敗しました: " + JSON.stringify(result));
-                }
-            } catch (error) {
-                console.error("ユーザー登録エラー:", error);
-                alert("サーバー通信に失敗しました: " + error.message);
-            }
+        if (!response.ok) {
+            throw new Error(`サーバーエラー: ${response.status} ${response.statusText}`);
         }
+
+        const text = await response.text(); // JSON 形式ではないレスポンスも考慮
+        console.log("サーバーからのレスポンス:", text);
+
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch (error) {
+            throw new Error("サーバーからのレスポンスが JSON 形式ではありません");
+        }
+
+        if (result.success) {
+            alert("ユーザ登録が成功しました");
+            console.log("フォームページへリダイレクト");
+            window.location.href = `form.html?userId=${userId}`;
+        } else {
+            alert("登録に失敗しました: " + JSON.stringify(result));
+        }
+    } catch (error) {
+        console.error("ユーザー登録エラー:", error);
+        alert("サーバー通信に失敗しました: " + error.message);
+    }
+}
+
 
         document.getElementById("registerBtn").addEventListener("click", registerUser);
         initLIFF();
