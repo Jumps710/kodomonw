@@ -15,17 +15,19 @@
 <body>
 
     <form id="donationForm">
-        <h1>寄付の報告</h1>
+        <h1><span id="nickname"></span> さん、寄付の報告をしてください</h1>
 
         <div class="form-group">
             <label for="itemName">品名:</label>
             <input type="text" id="itemName" placeholder="お米、缶詰など">
         </div>
 
-        <div class="form-group input-wrapper">
+        <div class="form-group">
             <label for="donor">寄付元:</label>
-            <input type="text" id="donor">
-            <span class="suffix">様</span>
+            <div class="input-wrapper">
+                <input type="text" id="donor">
+                <span class="suffix">様</span>
+            </div>
         </div>
 
         <div class="form-group">
@@ -46,24 +48,94 @@
         </div>
     </form>
 
+    <!-- ダイジェスト確認モーダル -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>寄付の報告を送信しますか？</h2>
+            <p><strong>品名:</strong> <span id="confirmItem"></span></p>
+            <p><strong>寄付元:</strong> <span id="confirmDonor"></span></p>
+            <p><strong>メッセージ:</strong> <span id="confirmMessage"></span></p>
+            <div id="confirmImagePreview" class="photo-preview"></div>
+            <button id="confirmSubmit">確定</button>
+        </div>
+    </div>
+
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get("userId");
+        let userId, displayName, imageFileBase64;
+
+        async function initLIFF() {
+            await liff.init({ liffId: "2006996059-NjRq5Mro" });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+            const profile = await liff.getProfile();
+            userId = profile.userId;
+            displayName = profile.displayName;
+            document.getElementById("nickname").textContent = displayName;
+        }
 
         document.getElementById("image").addEventListener("change", function(event) {
             const file = event.target.files[0];
-            const previewContainer = document.getElementById("photoPreview");
+            if (!file) return;
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="プレビュー画像" class="thumbnail">`;
-                };
-                reader.readAsDataURL(file);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageFileBase64 = e.target.result.split(",")[1];
+                document.getElementById("photoPreview").innerHTML = `<img src="${e.target.result}" alt="プレビュー画像" class="thumbnail">`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById("submitDonation").addEventListener("click", function(event) {
+            event.preventDefault();
+
+            const itemName = document.getElementById("itemName").value;
+            const donor = document.getElementById("donor").value;
+            const message = document.getElementById("message").value;
+
+            if (!itemName || !donor || !message) {
+                alert("すべての項目を入力してください");
+                return;
+            }
+
+            document.getElementById("confirmItem").textContent = itemName;
+            document.getElementById("confirmDonor").textContent = donor + " 様";
+            document.getElementById("confirmMessage").textContent = message;
+
+            document.getElementById("confirmImagePreview").innerHTML = document.getElementById("photoPreview").innerHTML;
+
+            document.getElementById("confirmationModal").style.display = "block";
+        });
+
+        document.getElementById("confirmSubmit").addEventListener("click", async function() {
+            document.getElementById("confirmationModal").style.display = "none";
+
+            const response = await fetch("YOUR_GAS_WEB_APP_URL", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "submitDonation",
+                    userId,
+                    nickname: displayName,
+                    itemName: document.getElementById("itemName").value,
+                    donor: document.getElementById("donor").value,
+                    message: document.getElementById("message").value,
+                    imageBase64: imageFileBase64
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert("寄付の報告が完了しました！");
+                window.location.reload();
             } else {
-                previewContainer.innerHTML = "";
+                alert("送信に失敗しました: " + result.error);
             }
         });
+
+        initLIFF();
     </script>
 
 </body>
