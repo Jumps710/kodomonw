@@ -10,15 +10,27 @@
         var vConsole = new VConsole();
         console.log("vConsoleが起動しました");
     </script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>LINE寄付アプリ</h2>
-    <div id="loginStatus">Loading...</div>
-    <div id="userInfo" style="display: none;">
-        <p><strong>LINEニックネーム:</strong> <span id="nickname"></span></p>
-        <p><strong>拠点:</strong> <select id="siteSelect"></select></p>
-        <button id="registerBtn">登録</button>
-    </div>
+
+    <form id="userForm">
+        <h1>LINE寄付アプリ</h1>
+
+        <div id="loading">Loading...</div>
+
+        <div id="userInfo" class="form-group" style="display: none;">
+            <label for="nickname">LINEニックネーム:</label>
+            <input type="text" id="nickname" disabled>
+
+            <label for="siteSelect">拠点:</label>
+            <select id="siteSelect"></select>
+
+            <div class="button-group">
+                <button id="registerBtn">登録</button>
+            </div>
+        </div>
+    </form>
 
     <script>
         const LIFF_ID = "2006996059-NjRq5Mro";
@@ -34,7 +46,7 @@
             const profile = await liff.getProfile();
             userId = profile.userId;
             displayName = profile.displayName;
-            document.getElementById("nickname").textContent = displayName;
+            document.getElementById("nickname").value = displayName;
 
             await checkUserRegistration(userId);
         }
@@ -45,11 +57,10 @@
                 const result = await response.json();
 
                 if (result.exists) {
-                    // 既存登録済みなら `form.html` にリダイレクト
                     window.location.href = `form.html?userId=${userId}`;
                 } else {
-                    // 未登録なら拠点登録画面を表示
                     await loadSiteOptions();
+                    document.getElementById("loading").style.display = "none";
                     document.getElementById("userInfo").style.display = "block";
                 }
             } catch (error) {
@@ -96,7 +107,6 @@
 
                 if (result.success) {
                     alert("登録が完了しました！");
-                    // ✅ ここでリダイレクトのみを実行
                     window.location.href = `form.html?userId=${userId}`;
                 } else {
                     alert("登録に失敗しました: " + JSON.stringify(result));
@@ -110,5 +120,6 @@
         document.getElementById("registerBtn").addEventListener("click", registerUser);
         initLIFF();
     </script>
+
 </body>
 </html>
