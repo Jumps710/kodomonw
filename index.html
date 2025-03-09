@@ -10,23 +10,59 @@
         var vConsole = new VConsole();
         console.log("vConsoleが起動しました");
     </script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>LINE寄付アプリ</h2>
-    <div id="loginStatus">Loading...</div>
-    <div id="userInfo" style="display: none;">
-        <p><strong>LINEニックネーム:</strong> <span id="nickname"></span></p>
-        <p><strong>拠点:</strong> <select id="siteSelect"></select></p>
-        <button id="registerBtn">登録</button>
-    </div>
-    
-    <div id="donationForm" style="display: none;">
-        <h3>寄付登録</h3>
-        <label>品名: <input type="text" id="itemName"></label><br>
-        <label>寄付元: <input type="text" id="donor"></label><br>
-        <label>メッセージ: <input type="text" id="message"></label><br>
-        <label>画像: <input type="file" id="image"></label><br>
-        <button id="submitDonation">寄付を登録</button>
+
+    <div class="container">
+        <h1>LINE寄付アプリ</h1>
+
+        <div id="loginStatus">Loading...</div>
+
+        <div id="userInfo" class="container" style="display: none;">
+            <div class="form-group">
+                <label for="nickname">LINEニックネーム:</label>
+                <span id="nickname"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="siteSelect">拠点:</label>
+                <select id="siteSelect"></select>
+            </div>
+
+            <div class="button-group">
+                <button id="registerBtn">登録</button>
+            </div>
+        </div>
+        
+        <div id="donationForm" class="container" style="display: none;">
+            <h3>寄付登録</h3>
+
+            <div class="form-group">
+                <label for="itemName">品名:</label>
+                <input type="text" id="itemName">
+            </div>
+
+            <div class="form-group">
+                <label for="donor">寄付元:</label>
+                <input type="text" id="donor">
+            </div>
+
+            <div class="form-group">
+                <label for="message">メッセージ:</label>
+                <input type="text" id="message">
+            </div>
+
+            <div class="form-group file-group">
+                <input type="file" id="image" hidden>
+                <label for="image" class="custom-file-label">画像を選択</label>
+                <span class="file-name">未選択</span>
+            </div>
+
+            <div class="button-group">
+                <button id="submitDonation">寄付を登録</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -75,15 +111,12 @@
 
         async function registerUser() {
             const siteName = document.getElementById("siteSelect").value;
-            console.log("登録ボタンが押されました", siteName);
-            
             if (!siteName) {
                 alert("拠点を選択してください");
                 return;
             }
 
             try {
-                console.log("APIリクエスト送信前", BACKEND_URL);
                 const response = await fetch(BACKEND_URL, {
                     method: "POST",
                     mode: "cors",
@@ -96,10 +129,7 @@
                     })
                 });
 
-                console.log("APIリクエスト送信完了", response);
                 const result = await response.json();
-                console.log("サーバー応答:", result);
-
                 if (result.success) {
                     alert("登録が完了しました！");
                     showDonationForm();
@@ -120,199 +150,6 @@
         document.getElementById("registerBtn").addEventListener("click", registerUser);
         initLIFF();
     </script>
+
 </body>
-    <style>
-        * {
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-body {
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 20px;
-}
-
-.container {
-    max-width: 600px;
-    margin: auto;
-    background: #ffffff;
-    padding: 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-    text-align: center;
-    color: #202124;
-    font-size: 24px;
-    margin-bottom: 30px;
-    font-weight: normal;
-}
-
-.form-group {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: #5f6368;
-}
-
-/* 入力フィールド */
-input[type="text"],
-select,
-textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #dadce0;
-    border-radius: 4px;
-    background-color: #ffffff;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-input[type="text"]:focus,
-select:focus,
-textarea:focus {
-    border-color: #1a73e8;
-    box-shadow: 0 0 3px rgba(26, 115, 232, 0.3);
-    outline: none;
-}
-
-/* Googleフォーム風のラジオボタン */
-.radio-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.radio-group input[type="radio"] {
-    display: none;
-}
-
-.radio-group label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 12px;
-    border: 1px solid #dadce0;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-}
-
-.radio-group input[type="radio"]:checked + label {
-    background-color: #1a73e8;
-    color: white;
-    border-color: #1a73e8;
-}
-
-/* Googleフォーム風のファイルアップロードボタン */
-.file-group {
-    display: flex;
-    align-items: center;
-}
-
-.file-group input[type="file"] {
-    display: none;
-}
-
-.file-group label {
-    background-color: #1a73e8;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    display: inline-block;
-    text-align: center;
-}
-
-.file-name {
-    margin-left: 10px;
-    font-size: 14px;
-    color: #5f6368;
-}
-
-/* ボタン */
-.button-group {
-    text-align: center;
-    margin-top: 20px;
-}
-
-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease-in-out;
-}
-
-#submitBtn {
-    background-color: #1a73e8;
-    color: white;
-    margin-right: 10px;
-}
-
-#submitBtn:hover {
-    background-color: #0f5bb5;
-}
-
-#resetBtn {
-    background-color: #d93025;
-    color: white;
-}
-
-#resetBtn:hover {
-    background-color: #b2221b;
-}
-
-/* 画像プレビュー */
-#photoPreview img {
-    max-width: 120px;
-    margin-top: 10px;
-    border-radius: 4px;
-}
-
-/* モーダル */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-    background-color: white;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 600px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    cursor: pointer;
-}
-        </style>
 </html>
