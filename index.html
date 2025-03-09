@@ -14,42 +14,40 @@
 </head>
 <body>
 
-    <div class="container">
-        <h1>寄付の報告</h1>
-        <div id="loading">Loading...</div>
+    <h1>寄付の報告</h1>
+    <div id="loading">Loading...</div>
 
-        <div id="donationForm" class="container" style="display: none;">
-            <div class="form-group">
-                <label for="itemName">品名:</label>
-                <input type="text" id="itemName" placeholder="お米、缶詰など">
-            </div>
+    <form id="donationForm" style="display: none;">
+        <div class="form-group">
+            <label for="itemName">品名:</label>
+            <input type="text" id="itemName" placeholder="お米、缶詰など">
+        </div>
 
-            <div class="form-group">
-                <label for="donor">寄付元:</label>
-                <div class="input-wrapper">
-                    <input type="text" id="donor">
-                    <span class="suffix">様</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="message">メッセージ:</label>
-                <textarea id="message" rows="4" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
-            </div>
-
-            <div class="form-group file-group">
-                <input type="file" id="image" hidden>
-                <label for="image" class="custom-file-label">画像を選択</label>
-                <span class="file-name">未選択</span>
-            </div>
-
-            <div id="photoPreview" class="photo-preview"></div>
-
-            <div class="button-group">
-                <button id="submitDonation">寄付を登録</button>
+        <div class="form-group">
+            <label for="donor">寄付元:</label>
+            <div class="input-wrapper">
+                <input type="text" id="donor">
+                <span class="suffix">様</span>
             </div>
         </div>
-    </div>
+
+        <div class="form-group">
+            <label for="message">メッセージ:</label>
+            <textarea id="message" rows="4" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
+        </div>
+
+        <div class="form-group file-group">
+            <input type="file" id="image" hidden>
+            <label for="image" class="custom-file-label">画像を選択</label>
+            <span class="file-name">未選択</span>
+        </div>
+
+        <div id="photoPreview" class="photo-preview"></div>
+
+        <div class="button-group">
+            <button id="submitDonation">寄付を登録</button>
+        </div>
+    </form>
 
     <script>
         const LIFF_ID = "2006996059-NjRq5Mro";
@@ -78,7 +76,7 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="プレビュー画像">`;
+                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="プレビュー画像" class="thumbnail">`;
                 };
                 reader.readAsDataURL(file);
             } else {
