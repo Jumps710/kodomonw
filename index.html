@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LINE寄付アプリ</title>
     <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
-    <!-- vConsoleのスクリプトを追加 -->
-<script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
-<script>
-    var vConsole = new VConsole();
-    console.log("vConsoleが起動しました");
-</script>
-
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+    <script>
+        var vConsole = new VConsole();
+        console.log("vConsoleが起動しました");
+    </script>
 </head>
 <body>
     <h2>LINE寄付アプリ</h2>
@@ -32,7 +30,7 @@
     </div>
 
     <script>
-        const LIFF_ID = "2006996059-NjRq5Mro"; // LIFF IDを設定
+        const LIFF_ID = "2006996059-NjRq5Mro";
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
         let userId, displayName;
 
@@ -75,78 +73,51 @@
             });
         }
 
-async function registerUser() {
-    const siteName = document.getElementById("siteSelect").value;
-    console.log("登録ボタンが押されました");
-    console.log("選択された拠点:", siteName);
-    
-    if (!siteName) {
-        alert("拠点を選択してください");
-        return;
-    }
+        async function registerUser() {
+            const siteName = document.getElementById("siteSelect").value;
+            console.log("登録ボタンが押されました", siteName);
+            
+            if (!siteName) {
+                alert("拠点を選択してください");
+                return;
+            }
 
-    try {
-        console.log("APIリクエスト送信前", BACKEND_URL);
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" }, // 変更
-            body: JSON.stringify({
-                action: "registerUser",
-                userId: userId,
-                nickname: displayName,
-                siteName: siteName
-            })
-        });
+            try {
+                console.log("APIリクエスト送信前", BACKEND_URL);
+                const response = await fetch(BACKEND_URL, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({
+                        action: "registerUser",
+                        userId: userId,
+                        nickname: displayName,
+                        siteName: siteName
+                    })
+                });
 
-        console.log("APIリクエスト送信完了", response);
-        if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`);
+                console.log("APIリクエスト送信完了", response);
+                const result = await response.json();
+                console.log("サーバー応答:", result);
+
+                if (result.success) {
+                    alert("登録が完了しました！");
+                    showDonationForm();
+                } else {
+                    alert("登録に失敗しました: " + JSON.stringify(result));
+                }
+            } catch (error) {
+                console.error("fetchエラー:", error);
+                alert("サーバー通信に失敗しました: " + error);
+            }
         }
-
-        const result = await response.json();
-        console.log("サーバー応答:", result);
-
-        if (result.success) {
-            alert("登録が完了しました！");
-            showDonationForm();
-        } else {
-            alert("登録に失敗しました");
-        }
-    } catch (error) {
-        console.error("エラー:", error);
-        alert("エラーが発生しました：" + error);
-    }
-}
-
-
-
 
         function showDonationForm() {
             document.getElementById("userInfo").style.display = "none";
             document.getElementById("donationForm").style.display = "block";
         }
 
-        async function submitDonation() {
-            const itemName = document.getElementById("itemName").value;
-            const donor = document.getElementById("donor").value;
-            const message = document.getElementById("message").value;
-            const imageFile = document.getElementById("image").files[0];
-
-            const formData = new FormData();
-            formData.append("action", "submitDonation");
-            formData.append("userId", userId);
-            formData.append("itemName", itemName);
-            formData.append("donor", donor);
-            formData.append("message", message);
-            formData.append("image", imageFile);
-
-            await fetch(`${BACKEND_URL}`, { method: "POST", body: formData });
-            alert("寄付を登録しました！");
-        }
-
         document.getElementById("registerBtn").addEventListener("click", registerUser);
-        document.getElementById("submitDonation").addEventListener("click", submitDonation);
-
         initLIFF();
     </script>
 </body>
