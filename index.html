@@ -36,18 +36,25 @@
             displayName = profile.displayName;
             document.getElementById("nickname").textContent = displayName;
 
-            checkUserRegistration(userId);
+            await checkUserRegistration(userId);
         }
 
         async function checkUserRegistration(userId) {
-            const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-            const result = await response.json();
+            try {
+                const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
+                const result = await response.json();
 
-            if (result.exists) {
-                showDonationForm();
-            } else {
-                loadSiteOptions();
-                document.getElementById("userInfo").style.display = "block";
+                if (result.exists) {
+                    // 既存登録済みなら、form.html にリダイレクト
+                    window.location.href = `form.html?userId=${userId}`;
+                } else {
+                    // 未登録なら拠点登録画面を表示
+                    await loadSiteOptions();
+                    document.getElementById("userInfo").style.display = "block";
+                }
+            } catch (error) {
+                console.error("ユーザー登録確認エラー:", error);
+                alert("登録状況の確認に失敗しました");
             }
         }
 
@@ -66,7 +73,6 @@
 
         async function registerUser() {
             const siteName = document.getElementById("siteSelect").value;
-            console.log("登録ボタンが押されました", siteName);
             
             if (!siteName) {
                 alert("拠点を選択してください");
@@ -74,7 +80,6 @@
             }
 
             try {
-                console.log("APIリクエスト送信前", BACKEND_URL);
                 const response = await fetch(BACKEND_URL, {
                     method: "POST",
                     mode: "cors",
@@ -87,13 +92,11 @@
                     })
                 });
 
-                console.log("APIリクエスト送信完了", response);
                 const result = await response.json();
-                console.log("サーバー応答:", result);
 
                 if (result.success) {
                     alert("登録が完了しました！");
-                    showDonationForm();
+                    window.location.href = `form.html?userId=${userId}`;
                 } else {
                     alert("登録に失敗しました: " + JSON.stringify(result));
                 }
@@ -101,11 +104,6 @@
                 console.error("fetchエラー:", error);
                 alert("サーバー通信に失敗しました: " + error);
             }
-        }
-
-        function showDonationForm() {
-            document.getElementById("userInfo").style.display = "none";
-            document.getElementById("donationForm").style.display = "block";
         }
 
         document.getElementById("registerBtn").addEventListener("click", registerUser);
