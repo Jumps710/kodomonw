@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINE寄付アプリ</title>
+    <title>寄付の報告</title>
     <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
     <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
     <script>
@@ -15,42 +15,26 @@
 <body>
 
     <div class="container">
-        <h1>LINE寄付アプリ</h1>
+        <h1>寄付の報告</h1>
+        <div id="loading">Loading...</div>
 
-        <div id="loginStatus">Loading...</div>
-
-        <div id="userInfo" class="container" style="display: none;">
-            <div class="form-group">
-                <label for="nickname">LINEニックネーム:</label>
-                <span id="nickname"></span>
-            </div>
-
-            <div class="form-group">
-                <label for="siteSelect">拠点:</label>
-                <select id="siteSelect"></select>
-            </div>
-
-            <div class="button-group">
-                <button id="registerBtn">登録</button>
-            </div>
-        </div>
-        
         <div id="donationForm" class="container" style="display: none;">
-            <h3>寄付登録</h3>
-
             <div class="form-group">
                 <label for="itemName">品名:</label>
-                <input type="text" id="itemName">
+                <input type="text" id="itemName" placeholder="お米、缶詰など">
             </div>
 
             <div class="form-group">
                 <label for="donor">寄付元:</label>
-                <input type="text" id="donor">
+                <div class="input-wrapper">
+                    <input type="text" id="donor">
+                    <span class="suffix">様</span>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="message">メッセージ:</label>
-                <input type="text" id="message">
+                <textarea id="message" rows="4" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
             </div>
 
             <div class="form-group file-group">
@@ -58,6 +42,8 @@
                 <label for="image" class="custom-file-label">画像を選択</label>
                 <span class="file-name">未選択</span>
             </div>
+
+            <div id="photoPreview" class="photo-preview"></div>
 
             <div class="button-group">
                 <button id="submitDonation">寄付を登録</button>
@@ -76,78 +62,30 @@
                 liff.login();
                 return;
             }
+            document.getElementById("loading").style.display = "none"; // Loadingを非表示
+
             const profile = await liff.getProfile();
             userId = profile.userId;
             displayName = profile.displayName;
-            document.getElementById("nickname").textContent = displayName;
 
-            checkUserRegistration(userId);
-        }
-
-        async function checkUserRegistration(userId) {
-            const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-            const result = await response.json();
-
-            if (result.exists) {
-                showDonationForm();
-            } else {
-                loadSiteOptions();
-                document.getElementById("userInfo").style.display = "block";
-            }
-        }
-
-        async function loadSiteOptions() {
-            const response = await fetch(`${BACKEND_URL}?action=getSites`);
-            const sites = await response.json();
-            const select = document.getElementById("siteSelect");
-
-            sites.forEach(site => {
-                let option = document.createElement("option");
-                option.value = site;
-                option.textContent = site;
-                select.appendChild(option);
-            });
-        }
-
-        async function registerUser() {
-            const siteName = document.getElementById("siteSelect").value;
-            if (!siteName) {
-                alert("拠点を選択してください");
-                return;
-            }
-
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: "POST",
-                    mode: "cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify({
-                        action: "registerUser",
-                        userId: userId,
-                        nickname: displayName,
-                        siteName: siteName
-                    })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert("登録が完了しました！");
-                    showDonationForm();
-                } else {
-                    alert("登録に失敗しました: " + JSON.stringify(result));
-                }
-            } catch (error) {
-                console.error("fetchエラー:", error);
-                alert("サーバー通信に失敗しました: " + error);
-            }
-        }
-
-        function showDonationForm() {
-            document.getElementById("userInfo").style.display = "none";
             document.getElementById("donationForm").style.display = "block";
         }
 
-        document.getElementById("registerBtn").addEventListener("click", registerUser);
+        document.getElementById("image").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            const previewContainer = document.getElementById("photoPreview");
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="プレビュー画像">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.innerHTML = "";
+            }
+        });
+
         initLIFF();
     </script>
 
