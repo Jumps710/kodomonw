@@ -20,8 +20,8 @@
         <div id="loading">お待ちください・・・</div>
 
         <div id="userInfo" class="form-group" style="display: none;">
-            <label>LINEニックネーム:</label>
             <p id="nickname" class="nickname-display"></p>
+            <p>さん、以下より拠点名を選択してください。</p>
 
             <label for="siteSelect">拠点:</label>
             <select id="siteSelect"></select>
@@ -33,55 +33,6 @@
     </form>
 
     <script>
-        const LIFF_ID = "2006996059-NjRq5Mro";
-        const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
-        let userId, displayName;
-
-        async function initLIFF() {
-            await liff.init({ liffId: LIFF_ID });
-            if (!liff.isLoggedIn()) {
-                liff.login();
-                return;
-            }
-            const profile = await liff.getProfile();
-            userId = profile.userId;
-            displayName = profile.displayName;
-            document.getElementById("nickname").textContent = displayName;
-
-            await checkUserRegistration(userId);
-        }
-
-        async function checkUserRegistration(userId) {
-            try {
-                const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-                const result = await response.json();
-
-                if (result.exists) {
-                    window.location.href = `form.html?userId=${userId}`;
-                } else {
-                    await loadSiteOptions();
-                    document.getElementById("loading").style.display = "none";
-                    document.getElementById("userInfo").style.display = "block";
-                }
-            } catch (error) {
-                console.error("ユーザー登録確認エラー:", error);
-                alert("登録状況の確認に失敗しました");
-            }
-        }
-
-        async function loadSiteOptions() {
-            const response = await fetch(`${BACKEND_URL}?action=getSites`);
-            const sites = await response.json();
-            const select = document.getElementById("siteSelect");
-
-            sites.forEach(site => {
-                let option = document.createElement("option");
-                option.value = site;
-                option.textContent = site;
-                select.appendChild(option);
-            });
-        }
-
         async function registerUser() {
             const siteName = document.getElementById("siteSelect").value;
             
@@ -103,6 +54,10 @@
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error("サーバーエラー");
+                }
+
                 const result = await response.json();
 
                 if (result.success) {
@@ -113,12 +68,11 @@
                 }
             } catch (error) {
                 console.error("fetchエラー:", error);
-                alert("サーバー通信に失敗しました: " + error);
+                alert("サーバー通信に失敗しました: " + error.message);
             }
         }
 
         document.getElementById("registerBtn").addEventListener("click", registerUser);
-        initLIFF();
     </script>
 
 </body>
