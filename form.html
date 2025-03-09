@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寄付の報告</title>
+    <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+    <script>
+        var vConsole = new VConsole();
+        console.log("vConsoleが起動しました");
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <form id="donationForm" style="display: none;">
+        <h1>寄付の報告</h1>
+
+        <div id="loading">Loading...</div>
+
+        <div class="form-group">
+            <label for="itemName">品名:</label>
+            <input type="text" id="itemName" placeholder="お米、缶詰など">
+        </div>
+
+        <div class="form-group">
+            <label for="donor">寄付元:</label>
+            <div class="input-wrapper">
+                <input type="text" id="donor">
+                <span class="suffix">様</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="message">メッセージ:</label>
+            <textarea id="message" rows="4" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
+        </div>
+
+        <div class="form-group file-group">
+            <input type="file" id="image" hidden>
+            <label for="image" class="custom-file-label">画像を選択</label>
+            <span class="file-name">未選択</span>
+        </div>
+
+        <div id="photoPreview" class="photo-preview"></div>
+
+        <div class="button-group">
+            <button id="submitDonation">寄付を登録</button>
+        </div>
+    </form>
+
+    <script>
+        const LIFF_ID = "2006996059-NjRq5Mro";
+        const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
+        let userId, displayName;
+
+        async function initLIFF() {
+            await liff.init({ liffId: LIFF_ID });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+            document.getElementById("loading").style.display = "none"; // Loadingを非表示
+
+            const profile = await liff.getProfile();
+            userId = profile.userId;
+            displayName = profile.displayName;
+
+            document.getElementById("donationForm").style.display = "block";
+        }
+
+        document.getElementById("image").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            const previewContainer = document.getElementById("photoPreview");
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="プレビュー画像" class="thumbnail">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.innerHTML = "";
+            }
+        });
+
+        initLIFF();
+    </script>
+
+</body>
+</html>
