@@ -123,11 +123,9 @@ async function registerUser() {
     }
 
     try {
-        console.log(`ユーザー登録開始: userId=${userId}, siteName=${siteName}`);
-
         const response = await fetch(BACKEND_URL, {
             method: "POST",
-            headers: { "Content-Type": "text/plain" }, // GASでは必須
+            headers: { "Content-Type": "text/plain" },
             body: JSON.stringify({
                 action: "registerUser",
                 userId: userId,
@@ -136,21 +134,26 @@ async function registerUser() {
             })
         });
 
-        const result = await response.json();
-        console.log("サーバーレスポンス:", result);
+        if (!response.ok) {
+            throw new Error(`サーバーエラー: ${response.status}`);
+        }
+
+        const text = await response.text();
+        const result = JSON.parse(text);
 
         if (result.success) {
             alert("✅ ユーザ登録が成功しました");
             window.location.href = `form.html?userId=${userId}`;
         } else {
-            alert("❌ 登録に失敗しました: " + JSON.stringify(result));
+            alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
         }
 
     } catch (error) {
-        console.error("通信エラー:", error);
-        alert("サーバー通信に失敗しました: " + error.message);
+        console.error("エラー:", error);
+        alert("サーバー通信に失敗しました：" + error.message);
     }
 }
+
 
 
 
