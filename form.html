@@ -66,7 +66,7 @@
 </head>
 <body>
 <form id="donationForm">
-    <h1><span id="nickname"></span> さん、寄付の報告をしてください</h1>
+    <h1 id="title"></h1> <!-- タイトルを動的に変更 -->
 
     <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label>
 
@@ -112,66 +112,86 @@
 
 <script>
 var vConsole = new VConsole();
-let userId, displayName, imageFileBase64;
+let userId, displayName, siteName, imageFileBase64;
 
+// URLパラメータから userId と siteName を取得
+const params = new URLSearchParams(window.location.search);
+userId = params.get("userId") || "";
+siteName = params.get("siteName") || "";
+
+// LIFF 初期化
 async function initLIFF() {
-    await liff.init({ liffId: "2006996059-NjRq5Mro" });
-    if (!liff.isLoggedIn()) { liff.login(); return; }
-    const profile = await liff.getProfile();
-    userId = profile.userId;
-    displayName = profile.displayName;
-    document.getElementById("nickname").textContent = displayName;
+    try {
+        await liff.init({ liffId: "2006996059-NjRq5Mro" });
+        if (!liff.isLoggedIn()) {
+            liff.login();
+            return;
+        }
+        const profile = await liff.getProfile();
+        displayName = profile.displayName;
+
+        // タイトルを設定
+        document.getElementById("title").innerHTML = `${siteName} ${displayName} さん、<br>寄付の報告をしてください`;
+    } catch (error) {
+        console.error("LIFF 初期化エラー:", error);
+    }
 }
 
-image.onchange = e => {
+// LIFF 初期化の実行
+initLIFF();
+
+// ファイル選択処理
+document.getElementById("image").addEventListener("change", e => {
     const file = e.target.files[0];
     document.querySelector('.file-name').textContent = file.name;
     const reader = new FileReader();
     reader.onload = e => {
         imageFileBase64 = e.target.result.split(",")[1];
-        photoPreview.innerHTML = `<img src="${e.target.result}" width="150">`;
+        document.getElementById("photoPreview").innerHTML = `<img src="${e.target.result}" width="150">`;
     };
     reader.readAsDataURL(file);
-};
+});
 
-submitDonation.onclick = e => {
+// 送信前のプレビュー
+document.getElementById("submitDonation").addEventListener("click", e => {
     e.preventDefault();
-    confirmItem.textContent = itemName.value;
-    confirmDonor.textContent = donor.value + " 様";
-    confirmMessage.textContent = message.value;
-    confirmImagePreview.innerHTML = photoPreview.innerHTML;
-    confirmationModal.style.display = "flex";
-};
+    document.getElementById("confirmItem").textContent = document.getElementById("itemName").value;
+    document.getElementById("confirmDonor").textContent = document.getElementById("donor").value + " 様";
+    document.getElementById("confirmMessage").textContent = document.getElementById("message").value;
+    document.getElementById("confirmImagePreview").innerHTML = document.getElementById("photoPreview").innerHTML;
+    document.getElementById("confirmationModal").style.display = "flex";
+});
 
-confirmSubmit.onclick = async () => {
-    loadingMsg.style.display = "block";
+// 送信処理
+document.getElementById("confirmSubmit").addEventListener("click", async () => {
+    document.getElementById("loadingMsg").style.display = "block";
     const params = new URLSearchParams({
         action: "submitDonation", userId, nickname: displayName,
-        itemName: itemName.value, donor: donor.value,
-        message: message.value, imageBase64: imageFileBase64 || ''
+        itemName: document.getElementById("itemName").value,
+        donor: document.getElementById("donor").value,
+        message: document.getElementById("message").value,
+        imageBase64: imageFileBase64 || ''
     });
     const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
         method: "POST", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body: params
     });
     const result = await res.json();
-    loadingMsg.style.display = "none";
+    document.getElementById("loadingMsg").style.display = "none";
     if (result.success || result.status === "success") {
-        confirmationModal.style.display = "none";
-        successModal.style.display = "flex";
+        document.getElementById("confirmationModal").style.display = "none";
+        document.getElementById("successModal").style.display = "flex";
     } else {
         alert("❌送信に失敗しました");
     }
-};
+});
 
-function closeModal() { confirmationModal.style.display = "none"; }
+function closeModal() { document.getElementById("confirmationModal").style.display = "none"; }
 function closeSuccess() {
-    successModal.style.display = "none";
-    donationForm.reset();
-    photoPreview.innerHTML = "";
+    document.getElementById("successModal").style.display = "none";
+    document.getElementById("donationForm").reset();
+    document.getElementById("photoPreview").innerHTML = "";
     document.querySelector('.file-name').textContent = "未選択";
 }
-
-initLIFF();
 </script>
 </body>
 </html>
