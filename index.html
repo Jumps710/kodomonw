@@ -26,7 +26,7 @@
             <select id="siteSelect"></select>
 
             <div class="button-group">
-                <button id="registerBtn"　type="button">登録</button>
+                <button id="registerBtn" type="button">登録</button>
             </div>
         </div>
     </form>
@@ -38,68 +38,45 @@
 
         async function initLIFF() {
             try {
-                console.log("LIFF 初期化中...");
                 await liff.init({ liffId: LIFF_ID });
 
                 if (!liff.isLoggedIn()) {
-                    console.log("LIFF 未ログイン: ログインページにリダイレクト");
                     liff.login();
                     return;
                 }
 
-                console.log("LIFF ログイン完了: ユーザ情報取得");
                 const profile = await liff.getProfile();
                 userId = profile.userId;
                 displayName = profile.displayName;
                 document.getElementById("nickname").textContent = displayName;
 
-                console.log(`ユーザーID取得完了: ${userId}`);
                 await checkUserRegistration(userId);
-
             } catch (error) {
-                console.error("LIFF 初期化エラー:", error);
                 alert("LIFF の初期化に失敗しました。ページを再読み込みしてください。");
             }
         }
 
         async function checkUserRegistration(userId) {
             try {
-                console.log(`ユーザー登録確認中: ${userId}`);
                 const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-
-                if (!response.ok) {
-                    throw new Error(`サーバーエラー: ${response.status}`);
-                }
-
                 const result = await response.json();
-                console.log(`ユーザー登録チェック結果: ${JSON.stringify(result)}`);
 
                 if (result.exists) {
-                    console.log("既存ユーザー: フォームページへリダイレクト");
                     window.location.href = `form.html?userId=${userId}`;
                 } else {
-                    console.log("新規ユーザー: 拠点選択フォームを表示");
                     await loadSiteOptions();
                     document.getElementById("loading").style.display = "none";
                     document.getElementById("userInfo").style.display = "block";
                 }
             } catch (error) {
-                console.error("ユーザー登録確認エラー:", error);
                 alert("登録状況の確認に失敗しました。ネットワーク接続を確認してください。");
             }
         }
 
         async function loadSiteOptions() {
             try {
-                console.log("拠点リスト取得中...");
                 const response = await fetch(`${BACKEND_URL}?action=getSites`);
-
-                if (!response.ok) {
-                    throw new Error(`拠点リスト取得エラー: ${response.status}`);
-                }
-
                 const sites = await response.json();
-                console.log(`拠点リスト取得成功: ${JSON.stringify(sites)}`);
 
                 const select = document.getElementById("siteSelect");
                 sites.forEach(site => {
@@ -109,57 +86,52 @@
                     select.appendChild(option);
                 });
             } catch (error) {
-                console.error("拠点リスト取得エラー:", error);
                 alert("拠点リストの取得に失敗しました。");
             }
         }
 
-async function registerUser() {
-    const siteName = document.getElementById("siteSelect").value;
+        async function registerUser() {
+            const siteName = document.getElementById("siteSelect").value;
 
-    if (!siteName) {
-        alert("拠点を選択してください");
-        return;
-    }
+            if (!siteName) {
+                alert("拠点を選択してください");
+                return;
+            }
 
-    const params = new URLSearchParams();
-    params.append("action", "registerUser");
-    params.append("userId", userId);
-    params.append("nickname", displayName);
-    params.append("siteName", siteName);
+            const params = new URLSearchParams();
+            params.append("action", "registerUser");
+            params.append("userId", userId);
+            params.append("nickname", displayName);
+            params.append("siteName", siteName);
 
-    try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json"
-            },
-            body: params
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Accept": "application/json"
+                    },
+                    body: params
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("✅ ユーザ登録が成功しました");
+                    window.location.href = `form.html?userId=${userId}`;
+                } else {
+                    alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
+                }
+            } catch (error) {
+                alert("サーバー通信に失敗しました：" + error.message);
+            }
+        }
+
+        document.getElementById("registerBtn").addEventListener("click", function(event) {
+            event.preventDefault();
+            registerUser();
         });
 
-        const result = await response.json();
-
-        if (result.status === "success") {
-            alert("✅ ユーザ登録が成功しました");
-            window.location.href = `form.html?userId=${userId}`;
-        } else {
-            alert("❌ 登録に失敗しました: " + (result.message || "不明なエラー"));
-        }
-    } catch (error) {
-        alert("サーバー通信に失敗しました：" + error.message);
-    }
-}
-
-
-
-
-
-
-
-
-
-        document.getElementById("registerBtn").addEventListener("click", registerUser);
         initLIFF();
     </script>
 
