@@ -139,6 +139,7 @@ async function registerUser() {
         }
 
         const text = await response.text();
+        console.log("サーバーから取得したテキスト:", text); // ★このログを確認する
         const result = JSON.parse(text);
 
         if (result.success) {
