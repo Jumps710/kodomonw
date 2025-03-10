@@ -44,7 +44,7 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            text-align: left;
+            text-align: left;  /* ★ 左寄せに変更 ★ */
             width: 90%; max-width: 400px;
             position: relative;
         }
@@ -61,6 +61,15 @@
             font-weight: bold;
             margin-top: 10px;
             display: none;
+        }
+
+        .preview-item {
+            margin-bottom: 10px;
+        }
+
+        .preview-item b {
+            display: inline-block;
+            width: 80px;  /* ラベル部分の幅を固定 */
         }
     </style>
 </head>
@@ -92,9 +101,9 @@
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h2>寄付の報告を送信しますか？</h2>
-        <p><b>品名:</b> <span id="confirmItem"></span></p>
-        <p><b>寄付元:</b> <span id="confirmDonor"></span></p>
-        <p><b>メッセージ:</b> <span id="confirmMessage"></span></p>
+        <div class="preview-item"><b>品名:</b> <span id="confirmItem"></span></div>
+        <div class="preview-item"><b>寄付元:</b> <span id="confirmDonor"></span></div>
+        <div class="preview-item"><b>メッセージ:</b> <span id="confirmMessage"></span></div>
         <div id="confirmImagePreview"></div>
         <button id="confirmSubmit">確定</button>
         <div class="loading-msg" id="loadingMsg">お待ちください・・・</div>
