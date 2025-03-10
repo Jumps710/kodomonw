@@ -143,7 +143,7 @@ async function registerUser(e) {
         const result = await response.json();
         if (result.success || result.status === "success") {
             showModal("<b>✅ ユーザ登録が成功しました</b>", () => {
-                window.location.href = `form.html?userId=${userId}`;
+    window.location.href = `form.html?userId=${userId}&siteName=${encodeURIComponent(siteName)}`;
             });
         } else {
             showModal("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
