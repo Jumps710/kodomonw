@@ -17,10 +17,6 @@
             display: inline-block;
         }
 
-        .file-name {
-            margin-left: 10px;
-        }
-
         #submitDonation, #confirmSubmit {
             background-color: #4CAF50;
             color: white;
@@ -59,6 +55,7 @@
             width: 90%;
             max-width: 400px;
             position: relative;
+            text-align: center;
         }
 
         .close {
@@ -68,40 +65,35 @@
             font-size: 24px;
             cursor: pointer;
         }
+
+        #successModal {
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-
 <form id="donationForm">
     <h1><span id="nickname"></span> さん、寄付の報告をしてください</h1>
-
     <div class="form-group">
         <label for="itemName">品名:</label>
         <input type="text" id="itemName" placeholder="お米、缶詰など">
     </div>
-
     <div class="form-group">
         <label for="donor">寄付元:</label>
-        <input type="text" id="donor">
-        <span class="suffix">様</span>
+        <input type="text" id="donor"><span class="suffix">様</span>
     </div>
-
     <div class="form-group">
         <label for="message">メッセージ:</label>
         <textarea id="message" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
     </div>
-
     <div class="form-group">
         <input type="file" id="image" hidden>
         <label for="image" class="custom-file-label">画像を選択</label>
         <span class="file-name">未選択</span>
     </div>
-
-    <div id="photoPreview" class="photo-preview"></div>
-
-    <div class="button-group">
-        <button id="submitDonation">寄付を登録</button>
-    </div>
+    <div id="photoPreview"></div>
+    <button id="submitDonation">寄付を登録</button>
 </form>
 
 <div id="confirmationModal" class="modal">
@@ -111,89 +103,58 @@
         <p><strong>品名:</strong> <span id="confirmItem"></span></p>
         <p><strong>寄付元:</strong> <span id="confirmDonor"></span></p>
         <p><strong>メッセージ:</strong> <span id="confirmMessage"></span></p>
-        <div id="confirmImagePreview" class="photo-preview"></div>
+        <div id="confirmImagePreview"></div>
         <button id="confirmSubmit">確定</button>
     </div>
 </div>
 
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeSuccess()">&times;</span>
+        ✅寄付の報告が完了しました！
+    </div>
+</div>
+
 <script>
-let userId, displayName, imageFileBase64;
+async function submitDonation() {
+    const params = new URLSearchParams({
+        action: "submitDonation",
+        userId, nickname: displayName,
+        itemName: itemName.value,
+        donor: donor.value,
+        message: message.value,
+        imageBase64: imageFileBase64 || ''
+    });
 
-async function initLIFF() {
-    await liff.init({ liffId: "2006996059-NjRq5Mro" });
-    if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-    }
-    const profile = await liff.getProfile();
-    userId = profile.userId;
-    displayName = profile.displayName;
-    document.getElementById("nickname").textContent = displayName;
-}
-
-document.getElementById("image").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        imageFileBase64 = e.target.result.split(",")[1];
-        document.getElementById("photoPreview").innerHTML = `<img src="${e.target.result}" alt="プレビュー画像" class="thumbnail">`;
-    };
-    reader.readAsDataURL(file);
-});
-
-document.getElementById("submitDonation").addEventListener("click", function(event) {
-    event.preventDefault();
-
-    const itemName = document.getElementById("itemName").value;
-    const donor = document.getElementById("donor").value;
-    const message = document.getElementById("message").value;
-
-    if (!itemName || !donor || !message) {
-        alert("すべての項目を入力してください");
-        return;
-    }
-
-    document.getElementById("confirmItem").textContent = itemName;
-    document.getElementById("confirmDonor").textContent = donor + " 様";
-    document.getElementById("confirmMessage").textContent = message;
-    document.getElementById("confirmImagePreview").innerHTML = document.getElementById("photoPreview").innerHTML;
-
-    document.getElementById("confirmationModal").style.display = "block";
-});
-
-document.querySelector(".close").onclick = function() {
-    document.getElementById("confirmationModal").style.display = "none";
-};
-
-document.getElementById("confirmSubmit").onclick = async function() {
-    const params = new URLSearchParams();
-    params.append("action", "submitDonation");
-    params.append("userId", userId);
-    params.append("nickname", displayName);
-    params.append("itemName", document.getElementById("itemName").value);
-    params.append("donor", document.getElementById("donor").value);
-    params.append("message", document.getElementById("message").value);
-    params.append("imageBase64", imageFileBase64 || '');
-
-    const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
+    const res = await fetch("YOUR_GAS_WEB_APP_URL", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: params
     });
 
-    const result = await res.json();
-    if (result.success) {
-        alert("寄付の報告が完了しました！");
-        location.reload();
-    } else {
-        alert("送信に失敗しました: " + result.error);
+    const text = await res.text();
+    try {
+        const result = JSON.parse(text);
+        if (result.success || result.status === "success") {
+            showSuccessModal();
+        } else {
+            alert("❌送信に失敗しました: " + (result.error || "不明なエラー"));
+        }
+    } catch (e) {
+        alert("❌予期せぬエラーが発生しました");
     }
-};
+}
+
+function showSuccessModal() {
+    document.getElementById("successModal").style.display = "block";
+}
+
+function closeSuccess() {
+    document.getElementById("successModal").style.display = "none";
+    location.reload();
+}
 
 initLIFF();
 </script>
-
 </body>
 </html>
