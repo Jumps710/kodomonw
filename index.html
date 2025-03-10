@@ -91,41 +91,51 @@
         }
 
         async function registerUser() {
-            const siteName = document.getElementById("siteSelect").value;
+    const siteName = document.getElementById("siteSelect").value;
 
-            if (!siteName) {
-                alert("拠点を選択してください");
-                return;
-            }
+    if (!siteName) {
+        alert("拠点を選択してください");
+        return;
+    }
 
-            const params = new URLSearchParams();
-            params.append("action", "registerUser");
-            params.append("userId", userId);
-            params.append("nickname", displayName);
-            params.append("siteName", siteName);
+    const params = new URLSearchParams();
+    params.append("action", "registerUser");
+    params.append("userId", userId);
+    params.append("nickname", displayName);
+    params.append("siteName", siteName);
 
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "Accept": "application/json"
-                    },
-                    body: params
-                });
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json"
+            },
+            body: params
+        });
 
-                const result = await response.json();
+        const text = await response.text();
+        console.log("【生のレスポンス】:", text); // 🔥必ずこのログを確認する
 
-                if (result.success) {
-                    alert("✅ ユーザ登録が成功しました");
-                    window.location.href = `form.html?userId=${userId}`;
-                } else {
-                    alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
-                }
-            } catch (error) {
-                alert("サーバー通信に失敗しました：" + error.message);
-            }
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch (parseError) {
+            throw new Error("JSONパースエラー: " + parseError.message + "\nレスポンス本文: " + text);
         }
+
+        if (result.success) {
+            alert("✅ ユーザ登録が成功しました");
+            window.location.href = `form.html?userId=${userId}`;
+        } else {
+            alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
+        }
+    } catch (error) {
+        console.error("エラー発生:", error);
+        alert("サーバー通信に失敗しました：" + error.message);
+    }
+}
+
 
         document.getElementById("registerBtn").addEventListener("click", function(event) {
             event.preventDefault();
