@@ -144,7 +144,7 @@ async function registerUser() {
 
         if (result.success) {
             alert("✅ ユーザ登録が成功しました");
-            window.location.href = `form.html?userId=${userId}`;
+        // window.location.href = `form.html?userId=${userId}`;
         } else {
             alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
         }
