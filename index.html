@@ -90,7 +90,7 @@
             }
         }
 
-        async function registerUser() {
+async function registerUser() {
     const siteName = document.getElementById("siteSelect").value;
 
     if (!siteName) {
@@ -115,16 +115,9 @@
         });
 
         const text = await response.text();
-        console.log("【生のレスポンス】:", text); // 🔥必ずこのログを確認する
+        const result = JSON.parse(text);
 
-        let result;
-        try {
-            result = JSON.parse(text);
-        } catch (parseError) {
-            throw new Error("JSONパースエラー: " + parseError.message + "\nレスポンス本文: " + text);
-        }
-
-        if (result.success) {
+        if (result.status === "success") { // ←🔥ここを修正しました
             alert("✅ ユーザ登録が成功しました");
             window.location.href = `form.html?userId=${userId}`;
         } else {
@@ -135,6 +128,7 @@
         alert("サーバー通信に失敗しました：" + error.message);
     }
 }
+
 
 
         document.getElementById("registerBtn").addEventListener("click", function(event) {
