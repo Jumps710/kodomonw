@@ -125,7 +125,7 @@ async function registerUser() {
   try {
       const response = await fetch(BACKEND_URL, {
           method: "POST",
-          headers: { "Content-Type": "text/plain" },
+          headers: { "Content-Type": "application/json"  },
           body: JSON.stringify({
               action: "registerUser",
               userId: userId,
