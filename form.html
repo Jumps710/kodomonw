@@ -175,7 +175,7 @@ document.getElementById("submitDonation").addEventListener("click", e => {
 document.getElementById("confirmSubmit").addEventListener("click", async () => {
     document.getElementById("loadingMsg").style.display = "block";
     const params = new URLSearchParams({
-        action: "submitDonation", userId, nickname: displayName,
+        action: "donation_submit", userId, nickname: displayName,
         itemName: document.getElementById("itemName").value,
         donor: document.getElementById("donor").value,
         message: document.getElementById("message").value,
