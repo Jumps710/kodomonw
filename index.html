@@ -139,19 +139,18 @@ async function registerUser() {
         });
 
         const result = await response.json();
-        console.log("レスポンス結果:", result);
 
-        if (result.success) {
+        if (result.status === "success") {
             alert("✅ ユーザ登録が成功しました");
             window.location.href = `form.html?userId=${userId}`;
         } else {
-            alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
+            alert("❌ 登録に失敗しました: " + (result.message || "不明なエラー"));
         }
     } catch (error) {
-        console.error("エラー発生:", error);
         alert("サーバー通信に失敗しました：" + error.message);
     }
 }
+
 
 
 
