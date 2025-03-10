@@ -6,71 +6,67 @@
     <title>寄付の報告</title>
     <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
     <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
-    <script>
-        var vConsole = new VConsole();
-    </script>
     <link rel="stylesheet" href="style.css">
     <style>
         .custom-file-label {
-            display: inline-block;
             background-color: #007bff;
             color: white;
             padding: 10px;
-            border-radius: 6px;
             cursor: pointer;
-            text-align: center;
-            width: 100%;
-            margin-bottom: 5px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
         .file-name {
-            display: block;
-            text-align: center;
-            color: #555;
+            margin-left: 10px;
         }
 
-        #submitDonation {
+        #submitDonation, #confirmSubmit {
             background-color: #4CAF50;
             color: white;
+            border: none;
             padding: 12px;
-            font-size: 18px;
             border-radius: 6px;
             cursor: pointer;
             width: 100%;
+            font-size: 18px;
+        }
+
+        #confirmSubmit:hover, #submitDonation:hover {
+            background-color: #45a049;
+        }
+
+        textarea {
+            resize: none;
+            height: 100px;
         }
 
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             background-color: rgba(0,0,0,0.5);
         }
 
         .modal-content {
-            background-color: #fefefe;
+            background-color: #fff;
             margin: 15% auto;
             padding: 20px;
             border-radius: 8px;
-            width: 80%;
+            width: 90%;
+            max-width: 400px;
             position: relative;
         }
 
         .close {
-            color: #aaa;
             position: absolute;
             right: 10px;
             top: 5px;
-            font-size: 28px;
+            font-size: 24px;
             cursor: pointer;
-        }
-
-        textarea {
-            height: 90px;
         }
     </style>
 </head>
@@ -86,12 +82,13 @@
 
     <div class="form-group">
         <label for="donor">寄付元:</label>
-        <input type="text" id="donor" placeholder="寄付元名">
+        <input type="text" id="donor">
+        <span class="suffix">様</span>
     </div>
 
     <div class="form-group">
         <label for="message">メッセージ:</label>
-        <textarea id="message" rows="3" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
+        <textarea id="message" placeholder="寄付の詳細や伝えたいことを記入してください（120文字以内）"></textarea>
     </div>
 
     <div class="form-group">
@@ -120,61 +117,82 @@
 </div>
 
 <script>
-    let userId, displayName, imageFileBase64;
+let userId, displayName, imageFileBase64;
 
-    async function initLIFF() {
-        await liff.init({ liffId: "2006996059-NjRq5Mro" });
-        if (!liff.isLoggedIn()) {
-            liff.login();
-            return;
-        }
-        const profile = await liff.getProfile();
-        userId = profile.userId;
-        displayName = profile.displayName;
-        document.getElementById("nickname").textContent = displayName;
+async function initLIFF() {
+    await liff.init({ liffId: "2006996059-NjRq5Mro" });
+    if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+    }
+    const profile = await liff.getProfile();
+    userId = profile.userId;
+    displayName = profile.displayName;
+    document.getElementById("nickname").textContent = displayName;
+}
+
+document.getElementById("image").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        imageFileBase64 = e.target.result.split(",")[1];
+        document.getElementById("photoPreview").innerHTML = `<img src="${e.target.result}" alt="プレビュー画像" class="thumbnail">`;
+    };
+    reader.readAsDataURL(file);
+});
+
+document.getElementById("submitDonation").addEventListener("click", function(event) {
+    event.preventDefault();
+
+    const itemName = document.getElementById("itemName").value;
+    const donor = document.getElementById("donor").value;
+    const message = document.getElementById("message").value;
+
+    if (!itemName || !donor || !message) {
+        alert("すべての項目を入力してください");
+        return;
     }
 
-    document.getElementById("image").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    document.getElementById("confirmItem").textContent = itemName;
+    document.getElementById("confirmDonor").textContent = donor + " 様";
+    document.getElementById("confirmMessage").textContent = message;
+    document.getElementById("confirmImagePreview").innerHTML = document.getElementById("photoPreview").innerHTML;
 
-        document.querySelector(".file-name").textContent = file.name;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            imageFileBase64 = e.target.result.split(",")[1];
-            document.getElementById("photoPreview").innerHTML = `<img src="${e.target.result}" class="thumbnail">`;
-        };
-        reader.readAsDataURL(file);
+    document.getElementById("confirmationModal").style.display = "block";
+});
+
+document.querySelector(".close").onclick = function() {
+    document.getElementById("confirmationModal").style.display = "none";
+};
+
+document.getElementById("confirmSubmit").onclick = async function() {
+    const params = new URLSearchParams();
+    params.append("action", "submitDonation");
+    params.append("userId", userId);
+    params.append("nickname", displayName);
+    params.append("itemName", document.getElementById("itemName").value);
+    params.append("donor", document.getElementById("donor").value);
+    params.append("message", document.getElementById("message").value);
+    params.append("imageBase64", imageFileBase64 || '');
+
+    const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params
     });
 
-    document.getElementById("submitDonation").addEventListener("click", function(event) {
-        event.preventDefault();
-        if (!itemName.value || !donor.value || !message.value) {
-            alert("すべての項目を入力してください");
-            return;
-        }
-        confirmItem.textContent = itemName.value;
-        confirmDonor.textContent = donor.value + " 様";
-        confirmMessage.textContent = message.value;
-        confirmImagePreview.innerHTML = photoPreview.innerHTML;
-        confirmationModal.style.display = "block";
-    });
+    const result = await res.json();
+    if (result.success) {
+        alert("寄付の報告が完了しました！");
+        location.reload();
+    } else {
+        alert("送信に失敗しました: " + result.error);
+    }
+};
 
-    document.querySelector(".close").onclick = () => confirmationModal.style.display = "none";
-
-    document.getElementById("confirmSubmit").onclick = async () => {
-        confirmationModal.style.display = "none";
-        const res = await fetch("YOUR_GAS_WEB_APP_URL", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "submitDonation", userId, nickname: displayName, itemName: itemName.value, donor: donor.value, message: message.value, imageBase64: imageFileBase64 })
-        });
-        const result = await res.json();
-        alert(result.success ? "寄付の報告が完了しました！" : `送信に失敗しました: ${result.error}`);
-        if (result.success) location.reload();
-    };
-
-    initLIFF();
+initLIFF();
 </script>
 
 </body>
