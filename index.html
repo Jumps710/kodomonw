@@ -115,43 +115,44 @@
         }
 
 async function registerUser() {
-  const siteName = document.getElementById("siteSelect").value;
+    const siteName = document.getElementById("siteSelect").value;
 
-  if (!siteName) {
-      alert("拠点を選択してください");
-      return;
-  }
+    if (!siteName) {
+        alert("拠点を選択してください");
+        return;
+    }
 
-  try {
-      const response = await fetch(BACKEND_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json"  },
-          body: JSON.stringify({
-              action: "registerUser",
-              userId: userId,
-              nickname: displayName,
-              siteName: siteName
-          })
-      });
+    const params = new URLSearchParams();
+    params.append("action", "registerUser");
+    params.append("userId", userId);
+    params.append("nickname", displayName);
+    params.append("siteName", siteName);
 
-      if (!response.ok) {
-          throw new Error(`サーバーエラー: ${response.status}`);
-      }
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json"
+            },
+            body: params
+        });
 
-      const result = await response.json(); // ★必ず json() を使う
+        const result = await response.json();
+        console.log("レスポンス結果:", result);
 
-      if (result.success) {
-          alert("✅ ユーザ登録が成功しました");
-          window.location.href = `form.html?userId=${userId}`;
-      } else {
-          alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
-      }
-
-  } catch (error) {
-      console.error("エラー:", error);
-      alert("サーバー通信に失敗しました：" + error.message);
-  }
+        if (result.success) {
+            alert("✅ ユーザ登録が成功しました");
+            window.location.href = `form.html?userId=${userId}`;
+        } else {
+            alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
+        }
+    } catch (error) {
+        console.error("エラー発生:", error);
+        alert("サーバー通信に失敗しました：" + error.message);
+    }
 }
+
 
 
 
