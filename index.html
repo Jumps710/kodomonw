@@ -126,7 +126,7 @@ async function registerUser(e) {
         return;
     }
     const params = new URLSearchParams({
-        action: "registerUser",
+action: "donation_registerUser",  // ✅ 修正
         userId,
         nickname: displayName,
         siteName
