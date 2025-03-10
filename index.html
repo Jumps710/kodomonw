@@ -139,23 +139,31 @@ async function registerUser() {
         }
 
         const text = await response.text();
-        console.log("サーバーから取得したテキスト:", text); // ★このログを確認する
-        const result = JSON.parse(text);
+
+        let result;
+        try {
+            // 不要な文字列や空白を取り除いてJSONパース
+            result = JSON.parse(text.trim());
+        } catch (parseError) {
+            console.error("JSON解析エラー:", parseError, "元データ:", text);
+            alert("登録は完了しましたが、サーバーのレスポンスに問題がありました。");
+            window.location.href = `form.html?userId=${userId}`;
+            return;
+        }
 
         if (result.success) {
             alert("✅ ユーザ登録が成功しました");
-                console.log("ここで処理を強制停止");
-    return; // 🔥🔥 これを追加
-        // window.location.href = `form.html?userId=${userId}`;
+            window.location.href = `form.html?userId=${userId}`;
         } else {
             alert("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
         }
 
     } catch (error) {
-        console.error("エラー:", error);
+        console.error("通信エラー:", error);
         alert("サーバー通信に失敗しました：" + error.message);
     }
 }
+
 
 
 
