@@ -79,7 +79,12 @@
 
     <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label>
 
-    <label>寄付元:<input type="text" id="donor"> 様</label>
+    <label>寄付元:</label>
+<div class="input-wrapper">
+    <input type="text" id="donor" placeholder="寄付者名（例: 山田太郎）※「様」は入力不要です">
+    <span class="suffix">様</span>
+</div>
+
 
     <label>メッセージ:
         <textarea id="message" placeholder="寄付の詳細や伝えたいこと（120文字以内）"></textarea>
