@@ -83,7 +83,7 @@ textarea {
     height: 80px;
 }
 
-/* 「寄付元」のポストフィックスを右側に配置 */
+/* 「寄付元」のポストフィックス「様」を右側に配置 */
 .input-wrapper {
     display: flex;
     align-items: center;
@@ -92,6 +92,13 @@ textarea {
 .input-wrapper input {
     flex: 1;
 }
+
+.suffix {
+    margin-left: 10px;
+    font-size: 18px;
+    color: #555;
+}
+
 
 .suffix {
     margin-left: 10px;
