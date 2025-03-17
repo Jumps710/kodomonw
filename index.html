@@ -65,7 +65,7 @@
 
 <script>
 var vConsole = new VConsole();
-console.log("vConsoleが起動しました");
+console.log("✅ vConsoleが起動しました");
 
 const LIFF_ID = "2006996059-NjRq5Mro";
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
@@ -73,19 +73,27 @@ const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT
 let userId, displayName;
 
 async function initLIFF() {
+    console.log("▶️ LIFF 初期化開始...");
     try {
         await liff.init({ liffId: LIFF_ID });
+        console.log("✅ LIFF 初期化成功");
+
         if (!liff.isLoggedIn()) {
+            console.log("⚠️ LIFF 未ログイン、ログイン処理を実行");
             liff.login();
             return;
         }
+
         const profile = await liff.getProfile();
         userId = profile.userId;
         displayName = profile.displayName;
+
+        console.log(`✅ LIFFログイン成功: userId=${userId}, displayName=${displayName}`);
+
         document.getElementById("nickname").textContent = displayName;
 
         if (!userId) {
-            throw new Error("LIFFの userId が取得できませんでした");
+            throw new Error("❌ LIFFの userId が取得できませんでした");
         }
 
         await checkUserRegistration(userId);
@@ -96,9 +104,8 @@ async function initLIFF() {
 }
 
 async function checkUserRegistration(userId) {
+    console.log(`▶️ checkUserRegistration() 実行: userId=${userId}`);
     try {
-        console.log(`📌 checkUser API呼び出し: userId=${userId}`);
-
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`, {
             method: "GET",
             cache: "no-store",
@@ -154,6 +161,7 @@ function closeModal() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("▶️ DOMContentLoaded イベント発火");
     const registerBtn = document.getElementById("registerBtn");
     if (registerBtn) {
         registerBtn.addEventListener("click", registerUser);
