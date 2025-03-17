@@ -115,6 +115,7 @@ async function checkUserRegistration(userId) {
 
 
 
+
 async function loadSiteOptions() {
     const response = await fetch(`${BACKEND_URL}?action=getSites`);
     const sites = await response.json();
