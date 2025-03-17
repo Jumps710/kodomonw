@@ -133,6 +133,17 @@ const params = new URLSearchParams(window.location.search);
 userId = params.get("userId") || "";
 siteName = params.get("siteName") || "";
 
+    document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteName = urlParams.get("siteName");
+    const nickname = urlParams.get("nickname");
+
+    if (siteName && nickname) {
+        document.getElementById("title").innerHTML = `${siteName} ${nickname} さん、<br>寄付の報告をしてください`;
+    }
+});
+
+
 // LIFF 初期化
 async function initLIFF() {
     try {
