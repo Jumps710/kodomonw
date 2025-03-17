@@ -8,7 +8,6 @@
     <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-      /* カスタムポップアップのスタイル */
       .modal {
           display: none;
           position: fixed;
@@ -45,7 +44,7 @@
 
 <form id="userForm">
     <h1 id="formTitle" style="display:none;">ユーザ登録</h1>
-    <div id="loading">お待ちください・・・</div>
+    <div id="loading">お待ちください...</div>
     <div id="userInfo" class="form-group" style="display: none;">
         <p><span id="nickname"></span> さん、以下より拠点名を選択してください。</p>
         <label for="siteSelect">拠点:</label>
@@ -56,7 +55,7 @@
     </div>
 </form>
 
-<!-- カスタムポップアップ -->
+<!-- モーダル -->
 <div id="customModal" class="modal">
     <div class="modal-content">
         <div id="modalMessage"></div>
@@ -70,6 +69,7 @@ console.log("vConsoleが起動しました");
 
 const LIFF_ID = "2006996059-NjRq5Mro";
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
+
 let userId, displayName;
 
 async function initLIFF() {
@@ -85,15 +85,16 @@ async function initLIFF() {
         document.getElementById("nickname").textContent = displayName;
         await checkUserRegistration(userId);
     } catch (error) {
+        console.error("❌ LIFF 初期化エラー:", error);
         showModal("LIFFの初期化に失敗しました。再読み込みしてください。");
     }
 }
+
 async function checkUserRegistration(userId) {
     try {
-        const timestamp = new Date().getTime(); // 🔹 キャッシュ防止用のタイムスタンプ
-        const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}&t=${timestamp}`, {
+        const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`, {
             method: "GET",
-            cache: "no-store", // 🔹 キャッシュを防ぐ
+            cache: "no-store",
             headers: {
                 "Cache-Control": "no-cache, no-store, must-revalidate",
                 "Pragma": "no-cache",
@@ -101,37 +102,10 @@ async function checkUserRegistration(userId) {
             }
         });
 
-        console.log("📌 checkUser API raw response:", response);
-        console.log("📌 checkUser response status:", response.status);
+        if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`);
-        }
-
-        const contentType = response.headers.get("content-type");
-        console.log("📌 checkUser response Content-Type:", contentType);
-
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error(`不正なレスポンス Content-Type: ${contentType}`);
-        }
-
-        const text = await response.text();
-        console.log("📌 checkUser response raw text:", text);
-
-        if (!text || text.trim() === "") {
-            throw new Error("checkUser のレスポンスが空です");
-        }
-
-        if (text.trim() === "{}") {
-            throw new Error("checkUser のレスポンスが空のオブジェクト `{}` です");
-        }
-
-        const result = JSON.parse(text);
-        console.log("📌 checkUser API parsed JSON:", result);
-
-        if (!result || typeof result !== "object") {
-            throw new Error("checkUser のレスポンスが JSON ではありません");
-        }
+        const result = await response.json();
+        console.log("✅ checkUser result:", result);
 
         if (result.exists) {
             console.log("✅ ユーザー確認成功: フォームへ遷移");
@@ -144,45 +118,33 @@ async function checkUserRegistration(userId) {
             document.getElementById("formTitle").style.display = "block";
         }
     } catch (error) {
-        console.error("❌ checkUser のリクエストでエラー:", error);
+        console.error("❌ checkUser のエラー:", error);
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
 
-
-
-
-
-
-
-
-
 async function loadSiteOptions() {
     try {
         const response = await fetch(`${BACKEND_URL}?action=getSites`);
+        if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
+
         const result = await response.json();
-
-        console.log("📌 getSites API response:", result); // ✅ API のレスポンスを確認
-
-        // sites が配列であることをチェック
-        if (!Array.isArray(result)) {
-            throw new Error(`getSites API のレスポンスが配列ではありません: ${JSON.stringify(result)}`);
-        }
+        if (!Array.isArray(result)) throw new Error("getSites のレスポンスが配列ではありません");
 
         const select = document.getElementById("siteSelect");
+        select.innerHTML = ""; // 既存のオプションをクリア
+
         result.forEach(site => {
             let option = document.createElement("option");
             option.value = site;
             option.textContent = site;
             select.appendChild(option);
         });
-
     } catch (error) {
         console.error("❌ loadSiteOptions のエラー:", error);
         showModal("拠点情報の取得に失敗しました。");
     }
 }
-
 
 async function registerUser(e) {
     e.preventDefault();
@@ -191,13 +153,15 @@ async function registerUser(e) {
         showModal("拠点を選択してください");
         return;
     }
-    const params = new URLSearchParams({
-action: "donation_registerUser",  // ✅ 修正
-        userId,
-        nickname: displayName,
-        siteName
-    });
+
     try {
+        const params = new URLSearchParams({
+            action: "donation_registerUser",
+            userId,
+            nickname: displayName,
+            siteName
+        });
+
         const response = await fetch(BACKEND_URL, {
             method: "POST",
             headers: {
@@ -206,24 +170,25 @@ action: "donation_registerUser",  // ✅ 修正
             },
             body: params
         });
+
         const result = await response.json();
         if (result.success || result.status === "success") {
-            showModal("<b>✅ ユーザ登録が成功しました</b>", () => {
-    window.location.href = `form.html?userId=${userId}&siteName=${encodeURIComponent(siteName)}`;
+            showModal("✅ ユーザ登録が成功しました", () => {
+                window.location.href = `form.html?userId=${userId}&siteName=${encodeURIComponent(siteName)}`;
             });
         } else {
             showModal("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
         }
     } catch (error) {
-        showModal("サーバー通信に失敗しました：" + error.message);
+        console.error("❌ registerUser のエラー:", error);
+        showModal("サーバー通信に失敗しました: " + error.message);
     }
 }
 
 function showModal(message, callback = null) {
     document.getElementById("modalMessage").innerHTML = message;
-    const modal = document.getElementById("customModal");
-    modal.style.display = "flex";
-    modal.callback = callback;
+    document.getElementById("customModal").style.display = "flex";
+    document.getElementById("customModal").callback = callback;
 }
 
 function closeModal() {
@@ -232,7 +197,12 @@ function closeModal() {
     if (modal.callback) modal.callback();
 }
 
-document.getElementById("registerBtn").addEventListener("click", registerUser);
+// 🔹 ボタンがある場合のみイベントを設定（エラー回避）
+const registerBtn = document.getElementById("registerBtn");
+if (registerBtn) {
+    registerBtn.addEventListener("click", registerUser);
+}
+
 initLIFF();
 </script>
 
