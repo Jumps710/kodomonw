@@ -100,19 +100,25 @@ async function checkUserRegistration(userId) {
             throw new Error(`HTTPエラー: ${response.status}`);
         }
 
-        // ✅ レスポンスヘッダーをチェック
         const contentType = response.headers.get("content-type");
         console.log("📌 checkUser response Content-Type:", contentType);
-        
+
         if (!contentType || !contentType.includes("application/json")) {
             throw new Error(`不正なレスポンス Content-Type: ${contentType}`);
         }
 
-        // ✅ `text()` でレスポンスを確認
         const text = await response.text();
         console.log("📌 checkUser response raw text:", text);
 
-        // ✅ `text()` の内容を JSON に変換
+        // 🔹 `text` の内容を明確にログに出す
+        if (!text || text.trim() === "") {
+            throw new Error("checkUser のレスポンスが空です");
+        }
+
+        if (text.trim() === "{}") {
+            throw new Error("checkUser のレスポンスが空のオブジェクト `{}` です");
+        }
+
         const result = JSON.parse(text);
         console.log("📌 checkUser API parsed JSON:", result);
 
@@ -135,6 +141,7 @@ async function checkUserRegistration(userId) {
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
 
 
 
