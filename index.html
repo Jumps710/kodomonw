@@ -92,21 +92,31 @@ async function initLIFF() {
 async function checkUserRegistration(userId) {
     try {
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-        
-        console.log("📌 checkUser API raw response:", response); // ✅ 生のレスポンスを確認
-        console.log("📌 checkUser response status:", response.status); // ✅ ステータスコードを確認
+
+        console.log("📌 checkUser API raw response:", response);
+        console.log("📌 checkUser response status:", response.status);
 
         if (!response.ok) {
             throw new Error(`HTTPエラー: ${response.status}`);
         }
 
-        const text = await response.text();  // ✅ レスポンスの生データを取得
+        // ✅ レスポンスヘッダーをチェック
+        const contentType = response.headers.get("content-type");
+        console.log("📌 checkUser response Content-Type:", contentType);
+        
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error(`不正なレスポンス Content-Type: ${contentType}`);
+        }
+
+        // ✅ `text()` でレスポンスを確認
+        const text = await response.text();
         console.log("📌 checkUser response raw text:", text);
 
-        const result = JSON.parse(text);  // JSON に変換
-        console.log("📌 checkUser API parsed JSON:", result);  // ✅ 解析後の JSON をログに出力
+        // ✅ `text()` の内容を JSON に変換
+        const result = JSON.parse(text);
+        console.log("📌 checkUser API parsed JSON:", result);
 
-        if (typeof result !== "object") {
+        if (!result || typeof result !== "object") {
             throw new Error("checkUser のレスポンスが JSON ではありません");
         }
 
@@ -122,9 +132,10 @@ async function checkUserRegistration(userId) {
         }
     } catch (error) {
         console.error("❌ checkUser のリクエストでエラー:", error);
-        showModal("登録状況の確認に失敗しました。ネットワークを確認してください。");
+        showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
 
 
 
