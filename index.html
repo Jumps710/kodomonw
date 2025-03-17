@@ -117,16 +117,31 @@ async function checkUserRegistration(userId) {
 
 
 async function loadSiteOptions() {
-    const response = await fetch(`${BACKEND_URL}?action=getSites`);
-    const sites = await response.json();
-    const select = document.getElementById("siteSelect");
-    sites.forEach(site => {
-        let option = document.createElement("option");
-        option.value = site;
-        option.textContent = site;
-        select.appendChild(option);
-    });
+    try {
+        const response = await fetch(`${BACKEND_URL}?action=getSites`);
+        const result = await response.json();
+
+        console.log("📌 getSites API response:", result); // ✅ API のレスポンスを確認
+
+        // sites が配列であることをチェック
+        if (!Array.isArray(result)) {
+            throw new Error(`getSites API のレスポンスが配列ではありません: ${JSON.stringify(result)}`);
+        }
+
+        const select = document.getElementById("siteSelect");
+        result.forEach(site => {
+            let option = document.createElement("option");
+            option.value = site;
+            option.textContent = site;
+            select.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("❌ loadSiteOptions のエラー:", error);
+        showModal("拠点情報の取得に失敗しました。");
+    }
 }
+
 
 async function registerUser(e) {
     e.preventDefault();
