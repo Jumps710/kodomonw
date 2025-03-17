@@ -92,15 +92,14 @@ async function initLIFF() {
 async function checkUserRegistration(userId) {
     try {
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-        if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
+
         const result = await response.json();
         console.log("checkUser result:", result);  // ✅ デバッグログ
 
         if (result.exists) {
             console.log("✅ ユーザー確認成功: フォームへ遷移");
-            window.location.href = `form.html?userId=${encodeURIComponent(userId)}&siteName=${encodeURIComponent(result.siteName)}`;
+            window.location.href = `form.html?userId=${encodeURIComponent(userId)}&siteName=${encodeURIComponent(result.siteName)}&nickname=${encodeURIComponent(result.nickname)}`;
         } else {
             console.log("⚠️ ユーザー未登録: 登録フォームを表示");
             await loadSiteOptions();
@@ -113,6 +112,7 @@ async function checkUserRegistration(userId) {
         showModal("登録状況の確認に失敗しました。ネットワークを確認してください。");
     }
 }
+
 
 
 async function loadSiteOptions() {
