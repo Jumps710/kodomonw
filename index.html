@@ -83,6 +83,11 @@ async function initLIFF() {
         userId = profile.userId;
         displayName = profile.displayName;
         document.getElementById("nickname").textContent = displayName;
+
+        if (!userId) {
+            throw new Error("LIFFの userId が取得できませんでした");
+        }
+
         await checkUserRegistration(userId);
     } catch (error) {
         console.error("❌ LIFF 初期化エラー:", error);
@@ -92,6 +97,8 @@ async function initLIFF() {
 
 async function checkUserRegistration(userId) {
     try {
+        console.log(`📌 checkUser API呼び出し: userId=${userId}`);
+
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`, {
             method: "GET",
             cache: "no-store",
@@ -102,86 +109,35 @@ async function checkUserRegistration(userId) {
             }
         });
 
-        if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
+        console.log("📌 checkUser API response:", response);
 
-        const result = await response.json();
-        console.log("✅ checkUser result:", result);
+        if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`);
+        }
 
-        if (result.exists) {
-            console.log("✅ ユーザー確認成功: フォームへ遷移");
-            window.location.href = `form.html?userId=${encodeURIComponent(userId)}&siteName=${encodeURIComponent(result.siteName)}&nickname=${encodeURIComponent(result.nickname)}`;
-        } else {
+        const text = await response.text();
+        console.log("📌 checkUser response raw text:", text);
+
+        if (!text || text.trim() === "" || text.trim() === "{}") {
+            throw new Error("checkUser のレスポンスが空か、不正なデータです");
+        }
+
+        const result = JSON.parse(text);
+        console.log("✅ checkUser API parsed JSON:", result);
+
+        if (!result.exists) {
             console.log("⚠️ ユーザー未登録: 登録フォームを表示");
             await loadSiteOptions();
             document.getElementById("loading").style.display = "none";
             document.getElementById("userInfo").style.display = "block";
             document.getElementById("formTitle").style.display = "block";
+        } else {
+            console.log("✅ ユーザー確認成功: フォームへ遷移");
+            window.location.href = `form.html?userId=${encodeURIComponent(userId)}&siteName=${encodeURIComponent(result.siteName)}&nickname=${encodeURIComponent(result.nickname)}`;
         }
     } catch (error) {
         console.error("❌ checkUser のエラー:", error);
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
-    }
-}
-
-async function loadSiteOptions() {
-    try {
-        const response = await fetch(`${BACKEND_URL}?action=getSites`);
-        if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
-
-        const result = await response.json();
-        if (!Array.isArray(result)) throw new Error("getSites のレスポンスが配列ではありません");
-
-        const select = document.getElementById("siteSelect");
-        select.innerHTML = ""; // 既存のオプションをクリア
-
-        result.forEach(site => {
-            let option = document.createElement("option");
-            option.value = site;
-            option.textContent = site;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error("❌ loadSiteOptions のエラー:", error);
-        showModal("拠点情報の取得に失敗しました。");
-    }
-}
-
-async function registerUser(e) {
-    e.preventDefault();
-    const siteName = document.getElementById("siteSelect").value;
-    if (!siteName) {
-        showModal("拠点を選択してください");
-        return;
-    }
-
-    try {
-        const params = new URLSearchParams({
-            action: "donation_registerUser",
-            userId,
-            nickname: displayName,
-            siteName
-        });
-
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json"
-            },
-            body: params
-        });
-
-        const result = await response.json();
-        if (result.success || result.status === "success") {
-            showModal("✅ ユーザ登録が成功しました", () => {
-                window.location.href = `form.html?userId=${userId}&siteName=${encodeURIComponent(siteName)}`;
-            });
-        } else {
-            showModal("❌ 登録に失敗しました: " + (result.error || "不明なエラー"));
-        }
-    } catch (error) {
-        console.error("❌ registerUser のエラー:", error);
-        showModal("サーバー通信に失敗しました: " + error.message);
     }
 }
 
@@ -197,13 +153,13 @@ function closeModal() {
     if (modal.callback) modal.callback();
 }
 
-// 🔹 ボタンがある場合のみイベントを設定（エラー回避）
-const registerBtn = document.getElementById("registerBtn");
-if (registerBtn) {
-    registerBtn.addEventListener("click", registerUser);
-}
-
-initLIFF();
+document.addEventListener("DOMContentLoaded", () => {
+    const registerBtn = document.getElementById("registerBtn");
+    if (registerBtn) {
+        registerBtn.addEventListener("click", registerUser);
+    }
+    initLIFF();
+});
 </script>
 
 </body>
