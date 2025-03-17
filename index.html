@@ -88,13 +88,17 @@ async function initLIFF() {
         showModal("LIFFの初期化に失敗しました。再読み込みしてください。");
     }
 }
-
 async function checkUserRegistration(userId) {
     try {
         const timestamp = new Date().getTime(); // 🔹 キャッシュ防止用のタイムスタンプ
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}&t=${timestamp}`, {
             method: "GET",
-            cache: "no-store"
+            cache: "no-store", // 🔹 キャッシュを防ぐ
+            headers: {
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
         });
 
         console.log("📌 checkUser API raw response:", response);
@@ -144,6 +148,7 @@ async function checkUserRegistration(userId) {
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
 
 
 
