@@ -44,7 +44,7 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            text-align: left;  /* ★ 左寄せに変更 ★ */
+            text-align: left;
             width: 90%; max-width: 400px;
             position: relative;
         }
@@ -69,22 +69,22 @@
 
         .preview-item b {
             display: inline-block;
-            width: 80px;  /* ラベル部分の幅を固定 */
+            width: 80px;
         }
     </style>
 </head>
 <body>
+
 <form id="donationForm">
     <h1 id="title"></h1> <!-- タイトルを動的に変更 -->
 
     <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label>
 
     <label>寄付元:</label>
-<div class="input-wrapper">
-    <input type="text" id="donor" placeholder="※「様」は入力不要です">
-    <span class="suffix">様</span>
-</div>
-
+    <div class="input-wrapper">
+        <input type="text" id="donor" placeholder="※「様」は入力不要です">
+        <span class="suffix">様</span>
+    </div>
 
     <label>メッセージ:
         <textarea id="message" placeholder="寄付の詳細や伝えたいこと（120文字以内）"></textarea>
@@ -126,44 +126,16 @@
 
 <script>
 var vConsole = new VConsole();
-let userId, displayName, siteName, imageFileBase64;
+let userId, siteName, nickname, imageFileBase64;
 
-// URLパラメータから userId と siteName を取得
+// URLパラメータから取得
 const params = new URLSearchParams(window.location.search);
 userId = params.get("userId") || "";
 siteName = params.get("siteName") || "";
+nickname = params.get("nickname") || "";
 
-    document.addEventListener("DOMContentLoaded", function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const siteName = urlParams.get("siteName");
-    const nickname = urlParams.get("nickname");
-
-    if (siteName && nickname) {
-        document.getElementById("title").innerHTML = `${siteName} ${nickname} さん、<br>寄付の報告をしてください`;
-    }
-});
-
-
-// LIFF 初期化
-async function initLIFF() {
-    try {
-        await liff.init({ liffId: "2006996059-NjRq5Mro" });
-        if (!liff.isLoggedIn()) {
-            liff.login();
-            return;
-        }
-        const profile = await liff.getProfile();
-        displayName = profile.displayName;
-
-        // タイトルを設定
-        document.getElementById("title").innerHTML = `${siteName} ${displayName} さん、<br>寄付の報告をしてください`;
-    } catch (error) {
-        console.error("LIFF 初期化エラー:", error);
-    }
-}
-
-// LIFF 初期化の実行
-initLIFF();
+// タイトルを設定
+document.getElementById("title").innerHTML = `${siteName} ${nickname} さん、<br>寄付の報告をしてください`;
 
 // ファイル選択処理
 document.getElementById("image").addEventListener("change", e => {
@@ -191,7 +163,7 @@ document.getElementById("submitDonation").addEventListener("click", e => {
 document.getElementById("confirmSubmit").addEventListener("click", async () => {
     document.getElementById("loadingMsg").style.display = "block";
     const params = new URLSearchParams({
-        action: "donation_submit", userId, nickname: displayName,
+        action: "donation_submit", userId, nickname,
         itemName: document.getElementById("itemName").value,
         donor: document.getElementById("donor").value,
         message: document.getElementById("message").value,
@@ -218,5 +190,6 @@ function closeSuccess() {
     document.querySelector('.file-name').textContent = "未選択";
 }
 </script>
+
 </body>
 </html>
