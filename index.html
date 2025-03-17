@@ -92,10 +92,23 @@ async function initLIFF() {
 async function checkUserRegistration(userId) {
     try {
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
-        if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
+        
+        console.log("📌 checkUser API raw response:", response); // ✅ 生のレスポンスを確認
+        console.log("📌 checkUser response status:", response.status); // ✅ ステータスコードを確認
 
-        const result = await response.json();
-        console.log("checkUser result:", result);  // ✅ デバッグログ
+        if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`);
+        }
+
+        const text = await response.text();  // ✅ レスポンスの生データを取得
+        console.log("📌 checkUser response raw text:", text);
+
+        const result = JSON.parse(text);  // JSON に変換
+        console.log("📌 checkUser API parsed JSON:", result);  // ✅ 解析後の JSON をログに出力
+
+        if (typeof result !== "object") {
+            throw new Error("checkUser のレスポンスが JSON ではありません");
+        }
 
         if (result.exists) {
             console.log("✅ ユーザー確認成功: フォームへ遷移");
@@ -112,6 +125,7 @@ async function checkUserRegistration(userId) {
         showModal("登録状況の確認に失敗しました。ネットワークを確認してください。");
     }
 }
+
 
 
 
