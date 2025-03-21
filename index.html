@@ -103,12 +103,17 @@ async function initLIFF() {
     }
 }
 
-async function checkUserRegistration() {
+async function checkUserRegistration(userId) {
     console.log(`▶️ checkUserRegistration() 実行: userId=${userId}`);
     try {
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`, {
             method: "GET",
-            cache: "no-store"
+            cache: "no-store",
+            headers: {
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
         });
 
         console.log("📌 checkUser API response:", response);
@@ -117,7 +122,14 @@ async function checkUserRegistration() {
             throw new Error(`HTTPエラー: ${response.status}`);
         }
 
-        const result = await response.json();
+        const text = await response.text();
+        console.log("📌 checkUser response raw text:", text);
+
+        if (!text || text.trim() === "" || text.trim() === "{}") {
+            throw new Error("checkUser のレスポンスが空か、不正なデータです");
+        }
+
+        const result = JSON.parse(text);
         console.log("✅ checkUser API parsed JSON:", result);
 
         if (result.exists) {
@@ -135,6 +147,38 @@ async function checkUserRegistration() {
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
+async function loadSiteOptions() {
+    console.log("🌐 loadSiteOptions() 実行");
+    try {
+        const response = await fetch(`${BACKEND_URL}?action=getSites`, {
+            method: "GET",
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`);
+        }
+
+        const sites = await response.json();
+        console.log("✅ getSites API parsed JSON:", sites);
+
+        const select = document.getElementById("siteSelect");
+        select.innerHTML = ""; // 一度クリア
+
+        sites.forEach(site => {
+            const option = document.createElement("option");
+            option.value = site;
+            option.textContent = site;
+            select.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("❌ loadSiteOptions のエラー:", error);
+        showModal("拠点リストの取得に失敗しました");
+    }
+}
+
 
 function showModal(message, callback = null) {
     document.getElementById("modalMessage").innerHTML = message;
