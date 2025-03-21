@@ -96,11 +96,6 @@ async function initLIFF() {
 
         document.getElementById("nickname").textContent = displayName;
 
-        if (!userId) {
-            throw new Error("❌ LIFFの userId が取得できませんでした");
-        }
-
-        // 初期化成功後にチェックを実施
         await checkUserRegistration(userId);
     } catch (error) {
         console.error("❌ LIFF 初期化エラー:", error);
@@ -166,14 +161,10 @@ function closeModal() {
     if (modal.callback) modal.callback();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("▶️ DOMContentLoaded イベント発火");
-    const registerBtn = document.getElementById("registerBtn");
-    if (registerBtn) {
-        registerBtn.addEventListener("click", registerUser);
-    }
+window.onload = function() {
+    console.log("🌐 window.onload イベント発火");
     initLIFF();
-});
+};
 </script>
 
 </body>
