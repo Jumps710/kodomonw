@@ -67,22 +67,19 @@
 var vConsole = new VConsole();
 console.log("✅ vConsoleが起動しました");
 
-const LIFF_ID = "2006996059-NjRq5Mro"; // 正しい LIFF ID を確認してください
+const LIFF_ID = "2006996059-NjRq5Mro";
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
 
 let userId, displayName;
 
 async function initLIFF() {
-    console.log("▶️ LIFF 初期化開始...");
+    console.log("🚀 LIFF 初期化開始");
     try {
-        // LIFF SDK バージョン確認
-        console.log(`LIFF SDK Version: ${liff.getVersion()}`);
-
         await liff.init({ liffId: LIFF_ID });
         console.log("✅ LIFF 初期化成功");
 
         if (!liff.isLoggedIn()) {
-            console.log("⚠️ LIFF 未ログイン、ログイン処理を実行");
+            console.log("⚠️ 未ログイン、ログイン処理を実行");
             liff.login();
             return;
         }
@@ -93,7 +90,9 @@ async function initLIFF() {
         userId = profile.userId;
         displayName = profile.displayName;
 
-        console.log(`✅ LIFFログイン成功: userId=${userId}, displayName=${displayName}`);
+        console.log("✅ プロフィール取得成功");
+        console.log(`👤 userId: ${userId}`);
+        console.log(`👤 displayName: ${displayName}`);
 
         document.getElementById("nickname").textContent = displayName;
 
@@ -101,6 +100,7 @@ async function initLIFF() {
             throw new Error("❌ LIFFの userId が取得できませんでした");
         }
 
+        // 初期化成功後にチェックを実施
         await checkUserRegistration(userId);
     } catch (error) {
         console.error("❌ LIFF 初期化エラー:", error);
@@ -137,15 +137,15 @@ async function checkUserRegistration(userId) {
         const result = JSON.parse(text);
         console.log("✅ checkUser API parsed JSON:", result);
 
-        if (!result.exists) {
+        if (result.exists) {
+            console.log("✅ ユーザー確認成功: フォームへ遷移");
+            window.location.href = `form.html?userId=${encodeURIComponent(userId)}&siteName=${encodeURIComponent(result.siteName)}&nickname=${encodeURIComponent(result.nickname)}`;
+        } else {
             console.log("⚠️ ユーザー未登録: 登録フォームを表示");
             await loadSiteOptions();
             document.getElementById("loading").style.display = "none";
             document.getElementById("userInfo").style.display = "block";
             document.getElementById("formTitle").style.display = "block";
-        } else {
-            console.log("✅ ユーザー確認成功: フォームへ遷移");
-            window.location.href = `form.html?userId=${encodeURIComponent(userId)}&siteName=${encodeURIComponent(result.siteName)}&nickname=${encodeURIComponent(result.nickname)}`;
         }
     } catch (error) {
         console.error("❌ checkUser のエラー:", error);
@@ -155,8 +155,9 @@ async function checkUserRegistration(userId) {
 
 function showModal(message, callback = null) {
     document.getElementById("modalMessage").innerHTML = message;
-    document.getElementById("customModal").style.display = "flex";
-    document.getElementById("customModal").callback = callback;
+    const modal = document.getElementById("customModal");
+    modal.style.display = "flex";
+    modal.callback = callback;
 }
 
 function closeModal() {
@@ -174,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initLIFF();
 });
 </script>
-
 
 </body>
 </html>
