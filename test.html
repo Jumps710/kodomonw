@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFF 動作確認</title>
+    <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
+    <script>
+        // SDK ロード確認
+        if (typeof liff === "undefined") {
+            console.error("❌ LIFF SDK が読み込まれていません");
+            alert("LIFF SDK が読み込まれていません");
+        } else {
+            console.log("✅ LIFF SDK が正しく読み込まれました");
+        }
+
+        async function initLIFF() {
+            console.log("🚀 LIFF 初期化開始");
+            try {
+                await liff.init({ liffId: "2006996059-NjRq5Mro" });
+                console.log("✅ LIFF 初期化成功");
+
+                if (!liff.isLoggedIn()) {
+                    console.log("⚠️ LIFF 未ログイン、ログイン処理を実行");
+                    liff.login();
+                    return;
+                }
+
+                console.log("🚀 LIFF ログイン済み");
+
+                const profile = await liff.getProfile();
+                const userId = profile.userId;
+                const displayName = profile.displayName;
+
+                console.log("✅ プロフィール取得成功");
+                console.log(`👤 userId: ${userId}`);
+                console.log(`👤 displayName: ${displayName}`);
+
+                alert(`LIFF 初期化成功\nuserId: ${userId}\ndisplayName: ${displayName}`);
+            } catch (error) {
+                console.error("❌ LIFF 初期化エラー:", error);
+                alert(`LIFF 初期化エラー: ${error.message}`);
+            }
+        }
+
+        window.onload = function() {
+            console.log("🌐 ウィンドウロード完了");
+            initLIFF();
+        };
+    </script>
+</head>
+<body>
+    <h1>LIFF 動作確認</h1>
+    <p>LIFF の初期化結果をコンソールおよびアラートで確認します。</p>
+</body>
+</html>
