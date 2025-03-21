@@ -106,15 +106,7 @@ async function initLIFF() {
 async function checkUserRegistration() {
     console.log(`▶️ checkUserRegistration() 実行: userId=${userId}`);
     try {
-        const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`, {
-            method: "GET",
-            cache: "no-store",
-            headers: {
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0"
-            }
-        });
+        const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`);
 
         console.log("📌 checkUser API response:", response);
 
@@ -122,14 +114,7 @@ async function checkUserRegistration() {
             throw new Error(`HTTPエラー: ${response.status}`);
         }
 
-        const text = await response.text();
-        console.log("📌 checkUser response raw text:", text);
-
-        if (!text || text.trim() === "" || text.trim() === "{}") {
-            throw new Error("checkUser のレスポンスが空か、不正なデータです");
-        }
-
-        const result = JSON.parse(text);
+        const result = await response.json();
         console.log("✅ checkUser API parsed JSON:", result);
 
         if (result.exists) {
@@ -147,6 +132,7 @@ async function checkUserRegistration() {
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
 
 
 async function loadSiteOptions() {
