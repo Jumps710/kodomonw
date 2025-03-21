@@ -166,6 +166,44 @@ async function loadSiteOptions() {
     }
 }
 
+    async function registerUser() {
+    const siteName = document.getElementById("siteSelect").value;
+    console.log("🚀 ユーザ登録開始: siteName=", siteName);
+
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                action: "donation_registerUser",
+                userId: userId,
+                displayName: displayName,
+                siteName: siteName
+            })
+        });
+
+        const result = await response.json();
+        console.log("✅ 登録成功:", result);
+
+        if (result.status === "success") {
+            showModal("登録が完了しました！", () => window.location.reload());
+        } else {
+            throw new Error(result.message);
+        }
+
+    } catch (error) {
+        console.error("❌ 登録エラー:", error);
+        showModal(`登録に失敗しました: ${error.message}`);
+    }
+}
+
+document.getElementById("registerBtn").addEventListener("click", async (event) => {
+    event.preventDefault();
+    await registerUser();
+});
+
 
 function showModal(message, callback = null) {
     document.getElementById("modalMessage").innerHTML = message;
