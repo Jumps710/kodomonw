@@ -67,7 +67,7 @@
 var vConsole = new VConsole();
 console.log("✅ vConsoleが起動しました");
 
-const LIFF_ID = "2006996059-NjRq5Mro";
+const LIFF_ID = "2006996059-NjRq5Mro"; // 正しい LIFF ID を確認してください
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
 
 let userId, displayName;
@@ -75,6 +75,9 @@ let userId, displayName;
 async function initLIFF() {
     console.log("▶️ LIFF 初期化開始...");
     try {
+        // LIFF SDK バージョン確認
+        console.log(`LIFF SDK Version: ${liff.getVersion()}`);
+
         await liff.init({ liffId: LIFF_ID });
         console.log("✅ LIFF 初期化成功");
 
@@ -83,6 +86,8 @@ async function initLIFF() {
             liff.login();
             return;
         }
+
+        console.log("🚀 LIFF ログイン済み");
 
         const profile = await liff.getProfile();
         userId = profile.userId;
@@ -169,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initLIFF();
 });
 </script>
+
 
 </body>
 </html>
