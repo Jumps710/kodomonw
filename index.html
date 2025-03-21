@@ -96,7 +96,7 @@ async function initLIFF() {
 
         document.getElementById("nickname").textContent = displayName;
 
-        await checkUserRegistration();
+        await checkUserRegistration(userId);
     } catch (error) {
         console.error("❌ LIFF 初期化エラー:", error);
         showModal("LIFFの初期化に失敗しました。再読み込みしてください。");
