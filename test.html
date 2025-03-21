@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF 動作確認</title>
+    <title>LIFF + fetchテスト</title>
     <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
     <script>
-        // SDK ロード確認
-        if (typeof liff === "undefined") {
-            console.error("❌ LIFF SDK が読み込まれていません");
-            alert("LIFF SDK が読み込まれていません");
-        } else {
-            console.log("✅ LIFF SDK が正しく読み込まれました");
-        }
+        const LIFF_ID = "2006996059-NjRq5Mro";
+        const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
 
         async function initLIFF() {
             console.log("🚀 LIFF 初期化開始");
             try {
-                await liff.init({ liffId: "2006996059-NjRq5Mro" });
+                await liff.init({ liffId: LIFF_ID });
                 console.log("✅ LIFF 初期化成功");
 
                 if (!liff.isLoggedIn()) {
@@ -37,9 +32,44 @@
                 console.log(`👤 displayName: ${displayName}`);
 
                 alert(`LIFF 初期化成功\nuserId: ${userId}\ndisplayName: ${displayName}`);
+
+                // fetchを実行
+                await testFetch(userId);
             } catch (error) {
                 console.error("❌ LIFF 初期化エラー:", error);
                 alert(`LIFF 初期化エラー: ${error.message}`);
+            }
+        }
+
+        async function testFetch(userId) {
+            const url = `${BACKEND_URL}?action=checkUser&userId=${userId}`;
+
+            try {
+                console.log("🚀 fetch開始: " + url);
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-cache"
+                    }
+                });
+
+                console.log("✅ fetchレスポンス: ", response);
+
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
+
+                const text = await response.text();
+                console.log("📌 fetchレスポンステキスト: ", text);
+
+                const json = JSON.parse(text);
+                console.log("✅ JSONパース成功: ", json);
+
+                alert(`成功！\n存在: ${json.exists}\nサイト名: ${json.siteName}\nニックネーム: ${json.nickname}`);
+            } catch (error) {
+                console.error("❌ fetchエラー: ", error);
+                alert("fetchエラー: " + error.message);
             }
         }
 
@@ -50,7 +80,7 @@
     </script>
 </head>
 <body>
-    <h1>LIFF 動作確認</h1>
-    <p>LIFF の初期化結果をコンソールおよびアラートで確認します。</p>
+    <h1>LIFF + fetch動作確認</h1>
+    <p>バックエンドとの通信が成功するかどうかを確認します。</p>
 </body>
 </html>
