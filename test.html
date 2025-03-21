@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF + fetchテスト</title>
+    <title>LIFF + fetchテスト (vConsole付き)</title>
     <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
     <script>
+        // vConsoleの初期化
+        var vConsole = new VConsole();
+        console.log("✅ vConsoleが起動しました");
+
         const LIFF_ID = "2006996059-NjRq5Mro";
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec";
 
@@ -16,7 +21,7 @@
                 console.log("✅ LIFF 初期化成功");
 
                 if (!liff.isLoggedIn()) {
-                    console.log("⚠️ LIFF 未ログイン、ログイン処理を実行");
+                    console.log("⚠️ 未ログイン、ログイン処理を実行");
                     liff.login();
                     return;
                 }
@@ -80,7 +85,7 @@
     </script>
 </head>
 <body>
-    <h1>LIFF + fetch動作確認</h1>
+    <h1>LIFF + fetch動作確認 (vConsole対応)</h1>
     <p>バックエンドとの通信が成功するかどうかを確認します。</p>
 </body>
 </html>
