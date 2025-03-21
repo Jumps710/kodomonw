@@ -103,7 +103,7 @@ async function initLIFF() {
     }
 }
 
-async function checkUserRegistration(userId) {
+async function checkUserRegistration() {
     console.log(`▶️ checkUserRegistration() 実行: userId=${userId}`);
     try {
         const response = await fetch(`${BACKEND_URL}?action=checkUser&userId=${userId}`, {
@@ -147,6 +147,7 @@ async function checkUserRegistration(userId) {
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
 
 async function loadSiteOptions() {
     console.log("🌐 loadSiteOptions() 実行");
