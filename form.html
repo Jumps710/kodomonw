@@ -135,7 +135,7 @@ siteName = params.get("siteName") || "";
 nickname = params.get("nickname") || "";
 
 // タイトルを設定
-document.getElementById("title").innerHTML = `${siteName} ${nickname} さん、<br>寄付の報告をしてください`;
+document.getElementById("title").innerHTML = `${siteName}<br> ${nickname} さん、<br>寄付の報告をしてください`;
 
 // ファイル選択処理
 document.getElementById("image").addEventListener("change", e => {
