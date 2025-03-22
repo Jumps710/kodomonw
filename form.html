@@ -162,13 +162,17 @@ document.getElementById("submitDonation").addEventListener("click", e => {
 // 送信処理
 document.getElementById("confirmSubmit").addEventListener("click", async () => {
     document.getElementById("loadingMsg").style.display = "block";
-    const params = new URLSearchParams({
-        action: "donation_submit", userId, nickname,
-        itemName: document.getElementById("itemName").value,
-        donor: document.getElementById("donor").value,
-        message: document.getElementById("message").value,
-        imageBase64: imageFileBase64 || ''
-    });
+const params = new URLSearchParams({
+    action: "donation_submit",
+    userId,
+    nickname,
+    siteName,  // siteName を追加
+    itemName: document.getElementById("itemName").value,
+    donor: document.getElementById("donor").value,
+    message: document.getElementById("message").value,
+    imageBase64: imageFileBase64 || ''
+});
+
     const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
         method: "POST", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body: params
     });
