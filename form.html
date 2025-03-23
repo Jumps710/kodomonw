@@ -142,8 +142,10 @@ document.getElementById("image").addEventListener("change", async (e) => {
 
     const reader = new FileReader();
     reader.onload = async (e) => {
-        const base64Data = e.target.result.split(",")[1];
-        imageFileBase64 = await compressImage(e.target.result);
+        const base64Data = e.target.result;
+        console.log("元のBase64長さ: ", base64Data.length); // ログ出力
+        imageFileBase64 = await compressImage(base64Data);
+        console.log("圧縮後のBase64長さ: ", imageFileBase64.length); // ログ出力
         document.getElementById("photoPreview").innerHTML = `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">`;
     };
     reader.readAsDataURL(file);
@@ -173,20 +175,22 @@ async function compressImage(base64Data) {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
+
             const compressed = canvas.toDataURL('image/jpeg', 0.7);
-            resolve(compressed.split(',')[1]);
+            const base64DataCompressed = compressed.split(',')[1];
+            resolve(base64DataCompressed);
         };
-        img.src = "data:image/jpeg;base64," + base64Data;
+        img.src = base64Data;
     });
 }
 
 // 送信前のプレビュー
-document.getElementById("submitDonation").addEventListener("click", (e) => {
+document.getElementById("submitDonation").addEventListener("click", async (e) => {
     e.preventDefault();
     document.getElementById("confirmItem").textContent = document.getElementById("itemName").value;
     document.getElementById("confirmDonor").textContent = document.getElementById("donor").value + " 様";
     document.getElementById("confirmMessage").textContent = document.getElementById("message").value;
-    document.getElementById("confirmImagePreview").innerHTML = document.getElementById("photoPreview").innerHTML;
+    document.getElementById("confirmImagePreview").innerHTML = `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">`;
     document.getElementById("confirmationModal").style.display = "flex";
 });
 
@@ -204,20 +208,39 @@ document.getElementById("confirmSubmit").addEventListener("click", async () => {
         imageBase64: imageFileBase64 || ''
     });
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: params
-    });
-    const result = await res.json();
-    document.getElementById("loadingMsg").style.display = "none";
-    if (result.success || result.status === "success") {
-        document.getElementById("successModal").style.display = "flex";
-    } else {
-        alert("❌送信に失敗しました");
+    try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params
+        });
+
+        const result = await res.json();
+        document.getElementById("loadingMsg").style.display = "none";
+        if (result.success || result.status === "success") {
+            document.getElementById("confirmationModal").style.display = "none";
+            document.getElementById("successModal").style.display = "flex";
+        } else {
+            alert("❌送信に失敗しました");
+        }
+    } catch (error) {
+        console.error("送信エラー:", error);
+        alert("送信に失敗しました");
     }
 });
+
+function closeModal() {
+    document.getElementById("confirmationModal").style.display = "none";
+}
+
+function closeSuccess() {
+    document.getElementById("successModal").style.display = "none";
+    document.getElementById("donationForm").reset();
+    document.getElementById("photoPreview").innerHTML = "";
+    document.querySelector('.file-name').textContent = "未選択";
+}
 </script>
+
 
 </body>
 </html>
