@@ -134,44 +134,40 @@ document.getElementById("image").addEventListener("change", async e => {
     document.getElementById("photoPreview").innerHTML = `<img src="data:image/jpeg;base64,${compressedBase64}" width="150">`;
 });
 
-function compressImage(file) {
+async function compressImage(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onload = function (event) {
+        reader.onload = (event) => {
             const img = new Image();
-            img.onload = function () {
+            img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const maxWidth = 800;
                 const maxHeight = 600;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round((height *= maxWidth / width));
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round((width *= maxHeight / height));
-                        height = maxHeight;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                canvas.toDataURL('image/jpeg', 0.8, (compressed) => {
-                    const base64Data = compressed.split(',')[1];
-                    resolve(base64Data);
-                });
+                canvas.width = maxWidth;
+                canvas.height = maxHeight;
+                ctx.drawImage(img, 0, 0, maxWidth, maxHeight);
+                const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                const base64Data = compressed.split(',')[1];
+                resolve(base64Data);
             };
             img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     });
 }
+
+document.getElementById("submitDonation").addEventListener("click", async (e) => {
+    e.preventDefault();
+    document.getElementById("confirmItem").textContent = document.getElementById("itemName").value;
+    document.getElementById("confirmDonor").textContent = document.getElementById("donor").value + " 様";
+    document.getElementById("confirmMessage").textContent = document.getElementById("message").value;
+    document.getElementById("confirmImagePreview").innerHTML = document.getElementById("photoPreview").innerHTML;
+    document.getElementById("confirmationModal").style.display = "flex";
+});
+
+function closeModal() { document.getElementById("confirmationModal").style.display = "none"; }
+function closeSuccess() { document.getElementById("successModal").style.display = "none"; }
 </script>
 
 </body>
