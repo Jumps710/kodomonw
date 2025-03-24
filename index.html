@@ -92,9 +92,11 @@ async function initLIFF() {
 
         console.log("✅ プロフィール取得成功");
         console.log(`👤 userId: ${userId}`);
-        console.log(`👤 displayName: ${displayName}`);
+        console.log(`👤 displayName: ${displayName}`);  // 追加: ニックネームのログ
 
+        // nicknameを直接表示して確認
         document.getElementById("nickname").textContent = displayName;
+        console.log(`✅ nickname DOMにセット: ${displayName}`);
 
         await checkUserRegistration();
     } catch (error) {
@@ -102,6 +104,7 @@ async function initLIFF() {
         showModal("LIFFの初期化に失敗しました。再読み込みしてください。");
     }
 }
+
 
 async function checkUserRegistration() {
     console.log(`▶️ checkUserRegistration() 実行: userId=${userId}`);
