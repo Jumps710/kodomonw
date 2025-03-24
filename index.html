@@ -123,6 +123,10 @@ async function checkUserRegistration() {
         } else {
             console.log("⚠️ ユーザー未登録: 登録フォームを表示");
             await loadSiteOptions();
+
+            // **ここでnicknameを表示させる**
+            document.getElementById("nickname").textContent = displayName;
+
             document.getElementById("loading").style.display = "none";
             document.getElementById("userInfo").style.display = "block";
             document.getElementById("formTitle").style.display = "block";
@@ -132,6 +136,7 @@ async function checkUserRegistration() {
         showModal(`登録状況の確認に失敗しました。\n${error.message}`);
     }
 }
+
 
 
 
