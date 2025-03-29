@@ -53,7 +53,7 @@
 
         .donation-item {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: flex-start;
             margin-bottom: 20px;
             padding: 15px;
@@ -69,11 +69,10 @@
         }
 
         .donation-image {
-            width: 100%;
-            max-width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            margin-bottom: 10px;
+            width: 180px;
+            height: auto;
+            margin-right: 20px;
+            object-fit: cover;
             border-radius: 5px;
         }
 
@@ -117,21 +116,25 @@
                 font-size: 24px;
             }
 
+            .donation-item {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .donation-image {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+            }
+
             .donation-title {
                 font-size: 18px;
             }
 
             .donation-message {
                 font-size: 14px;
-            }
-
-            .donation-item {
-                padding: 10px;
-                margin-bottom: 15px;
-            }
-
-            .donation-image {
-                max-height: 250px;
             }
 
             .donation-reporter {
@@ -202,7 +205,7 @@
                 return monthFilter === "all" || reportMonth === monthFilter;
             });
 
-            const recentDonations = filteredDonations.slice(0, 10).map(donation => `
+            const recentDonations = filteredDonations.map(donation => `
                 <div class="donation-item">
                     ${donation.imageUrl ? `<img src="${donation.imageUrl}" alt="寄付画像" class="donation-image">` : ''}
                     <div class="donation-text">
@@ -217,12 +220,7 @@
                 </div>
             `).join('');
 
-            const pastDonations = filteredDonations.slice(10).map(donation => `
-                ◆${formatDate(donation.timestamp)} ${donation.donor} 様より ${donation.itemName} のご支援をいただきました
-                ${donation.instagramUrl ? `(<a href="${donation.instagramUrl}" target="_blank" style="color: #74A72D;">Instagram</a>)` : ''}
-            `).join('<br>');
-
-            document.getElementById("donation-list").innerHTML = recentDonations + "<hr>" + pastDonations;
+            document.getElementById("donation-list").innerHTML = recentDonations;
         }
 
         loadDonations();
