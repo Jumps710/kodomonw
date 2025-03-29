@@ -72,21 +72,6 @@
     <button class="donation-view-button" onclick="location.href='https://jumps710.github.io/kodomonw/lp.html'">寄付履歴をみる</button>
 </div>
 
-<script>
-    // 寄付データ取得
-    async function fetchDonations() {
-        try {
-            const response = await fetch('https://jumps710.github.io/kodomonw/data/kifu.json');
-            const data = await response.json();
-            console.log("寄付データ", data);
-        } catch (error) {
-            console.error("寄付データ取得エラー", error);
-        }
-    }
-
-    // 初期化
-    fetchDonations();
-</script>
 
 </body>
 </html>
