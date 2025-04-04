@@ -111,7 +111,7 @@
 
     <div id="foodFields" style="display:none">
       <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label><br><br>
-      <label>寄付元:<input type="text" id="donor" placeholder="※「様」は入力不要です"> <span class="suffix">様</span></label><br><br>
+      <label class="input-wrapper">寄付元:<input type="text" id="donor" placeholder="※「様」は入力不要です"><span class="suffix">様</span></label><br><br>
       <label>メッセージ:<br><textarea id="message" placeholder="寄付の詳細や伝えたいこと（120文字以内）"></textarea></label><br><br>
       <div>
         <input type="file" id="image" hidden>
@@ -122,8 +122,8 @@
     </div>
 
     <div id="moneyFields" style="display:none">
-      <label>寄付元:<input type="text" id="moneyDonor" placeholder="※「様」は入力不要です"> <span class="suffix">様</span></label><br><br>
-      <label>金額:<input type="number" id="amount" placeholder="例：3000"> <span class="suffix">円</span></label>
+      <label class="input-wrapper">寄付元:<input type="text" id="moneyDonor" placeholder="※「様」は入力不要です"><span class="suffix">様</span></label><br><br>
+      <label class="input-wrapper">金額:<input type="number" id="amount" placeholder="例：3000"><span class="suffix">円</span></label>
     </div>
 
     <button id="submitDonation">寄付を登録</button>
