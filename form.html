@@ -6,14 +6,7 @@
   <title>寄付の報告</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
-<!-- vConsoleの初期化はDOMContentLoadedで確実に読み込ませる -->
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    new VConsole();
-    console.log("✅ vConsole 起動しました");
-  });
-</script>
-
+  <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
   <style>
     .custom-file-label {
       background-color: #007bff;
@@ -157,7 +150,11 @@
 
   <script>
     // vConsoleの初期化（デバッグ用コンソール表示）
-const vConsole = new VConsole();
+window.addEventListener('DOMContentLoaded', () => {
+  window.vConsole = new VConsole();
+  console.log("✅ vConsole 起動しました");
+  window.selectDonationType = selectDonationType;
+});
     // 寄付の種類を保持する（'food' または 'money'）
 let donationType = "";
     // アップロードされた画像のBase64データを格納
@@ -169,7 +166,7 @@ const params = new URLSearchParams(window.location.search);
     const siteName = params.get("siteName") || "";
     const nickname = params.get("nickname") || "";
 
-// 寄付タイプ選択時のフォーム切り替え
+    // 寄付タイプ選択時のフォーム切り替え
 function selectDonationType(type) {
   // 選択された寄付タイプを保存
   donationType = type;
@@ -191,8 +188,8 @@ function selectDonationType(type) {
     // 金銭寄付フォームを表示
     document.getElementById("moneyFields").style.display = "block";
   }
-}
 
+    }
 
     // 画像ファイルが選択されたときの処理
 // ファイル名の表示とプレビュー画像の生成
