@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>寄付の報告</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
   <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
-  <link rel="stylesheet" href="style.css">
   <style>
     .custom-file-label {
       background-color: #007bff;
@@ -53,227 +53,258 @@
     }
     .preview-item { margin-bottom: 10px; }
     .preview-item b { display: inline-block; width: 80px; }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 400px;
+      margin: 40px auto;
+    }
+    .donation-type-button {
+      padding: 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    .donation-type-food {
+      background-color: #4CAF50;
+    }
+    .donation-type-food:hover {
+      background-color: #3e8e41;
+    }
+    .donation-type-money {
+      background-color: #008080;
+    }
+    .donation-type-money:hover {
+      background-color: #006666;
+    }
+    @media screen and (max-width: 480px) {
+      .donation-type-button {
+        padding: 12px;
+        font-size: 16px;
+      }
+      .button-container {
+        gap: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-
-<!-- 寄付タイプ選択画面 -->
-<div id="selectType" style="text-align:center; margin: 20px 0;">
-  <h2>どちらの寄付か選択してください</h2>
-  <button onclick="selectDonationType('food')">食品</button>
-  <button onclick="selectDonationType('money')">金銭</button>
-</div>
-
-<!-- メインフォーム（非表示で開始） -->
-<form id="donationForm" style="display:none">
-  <!-- Webへ公開の選択（共通） -->
-  <div id="webOpenSection">
-    <label>Webへ公開:<br>
-      <input type="radio" name="open" value="true" checked> する　
-      <input type="radio" name="open" value="false"> しない
-    </label>
+  <div id="selectType" class="button-container">
+    <h2 style="text-align: center; margin-bottom: 20px;">どちらの寄付か選択してください</h2>
+    <button class="donation-type-button donation-type-food" onclick="selectDonationType('food')">食品</button>
+    <button class="donation-type-button donation-type-money" onclick="selectDonationType('money')">金銭</button>
   </div>
 
-  <!-- 食品寄付用フィールド -->
-  <div id="foodFields">
-    <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label>
-    <label>寄付元:</label>
-    <div class="input-wrapper">
-      <input type="text" id="donor" placeholder="※「様」は入力不要です">
-      <span class="suffix">様</span>
+  <form id="donationForm" style="display:none; text-align:center; margin-top: 40px;">
+    <div id="webOpenSection" style="margin-bottom: 20px;">
+      <label>Webへ公開:<br>
+        <input type="radio" name="open" value="true" checked> する　
+        <input type="radio" name="open" value="false"> しない
+      </label>
     </div>
-    <label>メッセージ:<textarea id="message" placeholder="寄付の詳細や伝えたいこと（120文字以内）"></textarea></label>
-    <div>
-      <input type="file" id="image" hidden>
-      <label for="image" class="custom-file-label">画像を選択</label>
-      <span class="file-name">未選択</span>
-    </div>
-    <div id="photoPreview"></div>
-  </div>
 
-  <!-- 金銭寄付用フィールド -->
-  <div id="moneyFields" style="display:none">
-    <label>寄付元:</label>
-    <div class="input-wrapper">
-      <input type="text" id="moneyDonor" placeholder="※「様」は入力不要です">
-      <span class="suffix">様</span>
+    <div id="foodFields" style="display:none">
+      <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label><br><br>
+      <label>寄付元:<input type="text" id="donor" placeholder="※「様」は入力不要です"> <span class="suffix">様</span></label><br><br>
+      <label>メッセージ:<br><textarea id="message" placeholder="寄付の詳細や伝えたいこと（120文字以内）"></textarea></label><br><br>
+      <div>
+        <input type="file" id="image" hidden>
+        <label for="image" class="custom-file-label">画像を選択</label>
+        <span class="file-name">未選択</span>
+      </div>
+      <div id="photoPreview"></div>
     </div>
-    <label>金額:</label>
-    <div class="input-wrapper">
-      <input type="number" id="amount" placeholder="例：3000">
-      <span class="suffix">円</span>
+
+    <div id="moneyFields" style="display:none">
+      <label>寄付元:<input type="text" id="moneyDonor" placeholder="※「様」は入力不要です"> <span class="suffix">様</span></label><br><br>
+      <label>金額:<input type="number" id="amount" placeholder="例：3000"> <span class="suffix">円</span></label>
+    </div>
+
+    <button id="submitDonation">寄付を登録</button>
+  </form>
+
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>寄付の報告を送信しますか？</h3>
+      <div id="confirmContent"></div>
+      <div id="confirmImagePreview"></div>
+      <button id="confirmSubmit">確定</button>
+      <div class="loading-msg" id="loadingMsg">お待ちください・・・</div>
     </div>
   </div>
 
-  <button id="submitDonation">寄付を登録</button>
-</form>
-
-<!-- 確認モーダル -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h3>寄付の報告を送信しますか？</h3>
-    <div id="confirmContent"></div>
-    <div id="confirmImagePreview"></div>
-    <button id="confirmSubmit">確定</button>
-    <div class="loading-msg" id="loadingMsg">お待ちください・・・</div>
+  <div id="successModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeSuccess()">&times;</span>
+      <div style="font-size:20px;font-weight:bold;">✅ 寄付の報告が完了しました！</div>
+      <button onclick="closeSuccess()">OK</button>
+    </div>
   </div>
-</div>
 
-<!-- 完了モーダル -->
-<div id="successModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeSuccess()">&times;</span>
-    <div style="font-size:20px;font-weight:bold;">✅ 寄付の報告が完了しました！</div>
-    <button onclick="closeSuccess()">OK</button>
-  </div>
-</div>
-
-<script>
-// vConsoleとLIFF SDK有効化
-var vConsole = new VConsole();
-let userId, siteName, nickname, imageFileBase64;
-
-// URLパラメータ取得
-const params = new URLSearchParams(window.location.search);
-userId = params.get("userId") || "";
-siteName = params.get("siteName") || "";
-nickname = params.get("nickname") || "";
-
-// タイトル設定
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("title")?.innerHTML = `${siteName}<br> ${nickname} さん、<br>寄付の報告をしてください`;
-});
-
-// 画像ファイル選択とプレビュー生成
-document.getElementById("image").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  document.querySelector('.file-name').textContent = file.name;
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64Data = e.target.result;
-    imageFileBase64 = await compressImage(base64Data);
-    document.getElementById("photoPreview").innerHTML = `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">`;
-  };
-  reader.readAsDataURL(file);
-});
-
-// 画像をリサイズ・圧縮
-async function compressImage(base64Data) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-      const maxWidth = 800, maxHeight = 600;
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-      }
-      if (height > maxHeight) {
-        width = Math.round((width * maxHeight) / height);
-        height = maxHeight;
-      }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      const compressed = canvas.toDataURL('image/jpeg', 0.7);
-      resolve(compressed.split(',')[1]);
-    };
-    img.src = base64Data;
-  });
-}
-
+  <script>
+    // vConsoleの初期化（デバッグ用コンソール表示）
+const vConsole = new VConsole();
+    // 寄付の種類を保持する（'food' または 'money'）
 let donationType = "";
+    // アップロードされた画像のBase64データを格納
+let imageFileBase64 = "";
 
-// 寄付タイプ選択時のフォーム切り替え
+    // URLパラメータからuserId, siteName, nicknameを取得
+const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId") || "";
+    const siteName = params.get("siteName") || "";
+    const nickname = params.get("nickname") || "";
+
+    // 寄付タイプ選択時のフォーム切り替え
 function selectDonationType(type) {
+  // 選択された寄付タイプを保存
   donationType = type;
+
+  // 最初の選択画面を非表示にし、フォームを表示
   document.getElementById("selectType").style.display = "none";
   document.getElementById("donationForm").style.display = "block";
   document.getElementById("webOpenSection").style.display = "block";
+
+  // フィールドを切り替え
   if (type === "food") {
+    // 食品寄付フォームを表示
     document.getElementById("foodFields").style.display = "block";
+    // 金銭寄付フォームを非表示
     document.getElementById("moneyFields").style.display = "none";
   } else {
+    // 食品寄付フォームを非表示
     document.getElementById("foodFields").style.display = "none";
+    // 金銭寄付フォームを表示
     document.getElementById("moneyFields").style.display = "block";
   }
-}
-
-// プレビュー画面生成
-document.getElementById("submitDonation").addEventListener("click", (e) => {
-  e.preventDefault();
-  let html = "";
-  const open = document.querySelector('input[name="open"]:checked')?.value === "true";
-  html += `<div class='preview-item'><b>Web公開:</b> ${open ? 'する' : 'しない'}</div>`;
-  if (donationType === "food") {
-    html += `<div class='preview-item'><b>品名:</b> ${document.getElementById("itemName").value}</div>`;
-    html += `<div class='preview-item'><b>寄付元:</b> ${document.getElementById("donor").value} 様</div>`;
-    html += `<div class='preview-item'><b>メッセージ:</b> ${document.getElementById("message").value}</div>`;
-    document.getElementById("confirmImagePreview").innerHTML = `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">`;
-  } else {
-    html += `<div class='preview-item'><b>寄付元:</b> ${document.getElementById("moneyDonor").value} 様</div>`;
-    html += `<div class='preview-item'><b>金額:</b> ${document.getElementById("amount").value} 円</div>`;
-    document.getElementById("confirmImagePreview").innerHTML = "";
-  }
-  document.getElementById("confirmContent").innerHTML = html;
-  document.getElementById("confirmationModal").style.display = "flex";
-});
-
-// 送信処理
-document.getElementById("confirmSubmit").addEventListener("click", async () => {
-  document.getElementById("loadingMsg").style.display = "block";
-  const open = document.querySelector('input[name="open"]:checked')?.value === "true";
-  const postParams = new URLSearchParams({
-    action: "donation_submit",
-    userId, nickname, siteName,
-    donationType,
-    open: open ? "true" : "false"
-  });
-  if (donationType === "food") {
-    postParams.append("itemName", document.getElementById("itemName").value);
-    postParams.append("donor", document.getElementById("donor").value);
-    postParams.append("message", document.getElementById("message").value);
-    postParams.append("imageBase64", imageFileBase64 || '');
-  } else {
-    postParams.append("donator", document.getElementById("moneyDonor").value);
-    postParams.append("amount", document.getElementById("amount").value);
-  }
-  try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: postParams
-    });
-    const result = await res.json();
-    document.getElementById("loadingMsg").style.display = "none";
-    if (result.success || result.status === "success") {
-      document.getElementById("confirmationModal").style.display = "none";
-      document.getElementById("successModal").style.display = "flex";
-    } else {
-      alert("❌送信に失敗しました");
+} else {
+        document.getElementById("foodFields").style.display = "none";
+        document.getElementById("moneyFields").style.display = "block";
+      }
     }
-  } catch (error) {
-    console.error("送信エラー:", error);
-    alert("送信に失敗しました");
-  }
-});
 
-// モーダルを閉じる
+    // 画像ファイルが選択されたときの処理
+// ファイル名の表示とプレビュー画像の生成
+// 画像はcompressImageで圧縮されたBase64形式に変換される
+document.getElementById("image").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      document.querySelector('.file-name').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target.result;
+        imageFileBase64 = await compressImage(base64Data);
+        document.getElementById("photoPreview").innerHTML = `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // 画像のリサイズ・圧縮を行う関数
+// 元画像のサイズが大きい場合はリサイズしてJPEG圧縮（画質0.7）し、Base64データを返す
+async function compressImage(base64Data) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxWidth = 800, maxHeight = 600;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressed.split(',')[1]);
+        };
+        img.src = base64Data;
+      });
+    }
+
+    // 寄付登録ボタン押下時の処理
+// 入力内容をプレビュー表示用HTMLに組み立てて、確認モーダルを表示する
+document.getElementById("submitDonation").addEventListener("click", (e) => {
+      e.preventDefault();
+      const open = document.querySelector('input[name="open"]:checked')?.value === "true";
+      let html = `<div class='preview-item'><b>Web公開:</b> ${open ? 'する' : 'しない'}</div>`;
+      if (donationType === "food") {
+        html += `<div class='preview-item'><b>品名:</b> ${document.getElementById("itemName").value}</div>`;
+        html += `<div class='preview-item'><b>寄付元:</b> ${document.getElementById("donor").value} 様</div>`;
+        html += `<div class='preview-item'><b>メッセージ:</b> ${document.getElementById("message").value}</div>`;
+        document.getElementById("confirmImagePreview").innerHTML = `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">`;
+      } else {
+        html += `<div class='preview-item'><b>寄付元:</b> ${document.getElementById("moneyDonor").value} 様</div>`;
+        html += `<div class='preview-item'><b>金額:</b> ${document.getElementById("amount").value} 円</div>`;
+        document.getElementById("confirmImagePreview").innerHTML = "";
+      }
+      document.getElementById("confirmContent").innerHTML = html;
+      document.getElementById("confirmationModal").style.display = "flex";
+    });
+
+    // プレビューで「確定」ボタン押下時の処理
+// 入力内容をGASに送信し、成功すれば完了モーダルを表示する
+document.getElementById("confirmSubmit").addEventListener("click", async () => {
+      document.getElementById("loadingMsg").style.display = "block";
+      const open = document.querySelector('input[name="open"]:checked')?.value === "true";
+      const postParams = new URLSearchParams({
+        action: "donation_submit",
+        userId, nickname, siteName,
+        donationType,
+        open: open ? "true" : "false"
+      });
+      if (donationType === "food") {
+        postParams.append("itemName", document.getElementById("itemName").value);
+        postParams.append("donor", document.getElementById("donor").value);
+        postParams.append("message", document.getElementById("message").value);
+        postParams.append("imageBase64", imageFileBase64 || '');
+      } else {
+        postParams.append("donator", document.getElementById("moneyDonor").value);
+        postParams.append("amount", document.getElementById("amount").value);
+      }
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycby3AtgmX1gCDd2KUeYT8TkUBkVKoh_VH0q3oflLp6Bp3tse0SOETZgGV9wgiP8fT4FY/exec", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: postParams
+        });
+        const result = await res.json();
+        document.getElementById("loadingMsg").style.display = "none";
+        if (result.success || result.status === "success") {
+          document.getElementById("confirmationModal").style.display = "none";
+          document.getElementById("successModal").style.display = "flex";
+        } else {
+          alert("❌送信に失敗しました");
+        }
+      } catch (error) {
+        console.error("送信エラー:", error);
+        alert("送信に失敗しました");
+      }
+    });
+
+    // 確認モーダルを閉じる関数
 function closeModal() {
-  document.getElementById("confirmationModal").style.display = "none";
-}
-function closeSuccess() {
-  document.getElementById("successModal").style.display = "none";
-  document.getElementById("donationForm").reset();
-  document.getElementById("photoPreview").innerHTML = "";
-  document.querySelector('.file-name').textContent = "未選択";
-  location.reload();
-}
-</script>
+      document.getElementById("confirmationModal").style.display = "none";
+    }
 
+    // 完了モーダルを閉じてフォームをリセットし、ページをリロードする関数
+function closeSuccess() {
+      document.getElementById("successModal").style.display = "none";
+      document.getElementById("donationForm").reset();
+      document.getElementById("photoPreview").innerHTML = "";
+      document.querySelector('.file-name').textContent = "未選択";
+      location.reload();
+    }
+  </script>
 </body>
 </html>
