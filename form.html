@@ -105,7 +105,6 @@
     </style>
 </head>
 <body>
-// 寄付タイプの選択
     <div id="selectType" class="button-container">
         <h2 style="text-align: center; margin-bottom: 18px;">どちらの寄付か選択してください</h2>
         <button class="donation-type-button donation-type-food" onclick="selectDonationType('food')">食品</button>
@@ -142,7 +141,6 @@
 
     <div id="photoPreview"></div>
 
-//金額寄付用のフィールド
     <div id="moneyFields" style="display:none">
         <label class="input-wrapper">寄付元:<input type="text" id="moneyDonor" placeholder="※「様」は入力不要です"><span class="suffix">様</span></label><br><br>
         <label class="input-wrapper">金額:<input type="number" id="amount" placeholder="例：3000"><span class="suffix">円</span></label>
@@ -151,7 +149,6 @@
     <button id="submitDonation">寄付を登録</button>
 </form>
 
-//プレビュー画面
 <div id="confirmationModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -174,7 +171,14 @@
 </div>
 
 <script>
-var vConsole = new VConsole();
+
+window.addEventListener('DOMContentLoaded', () => {
+        
+  window.vConsole = new VConsole();
+  console.log("✅ vConsole 起動しました");
+  window.selectDonationType = selectDonationType;
+});
+
 let userId, siteName, nickname, imageFileBase64;
 
 // 寄付の種類を保持する（'food' または 'money'）
