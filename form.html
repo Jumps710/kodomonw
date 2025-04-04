@@ -6,7 +6,14 @@
   <title>寄付の報告</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://static.line-scdn.net/liff/edge/versions/2.20.0/sdk.js"></script>
-  <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+<!-- vConsoleの初期化はDOMContentLoadedで確実に読み込ませる -->
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    new VConsole();
+    console.log("✅ vConsole 起動しました");
+  });
+</script>
+
   <style>
     .custom-file-label {
       background-color: #007bff;
