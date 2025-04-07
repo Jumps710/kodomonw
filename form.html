@@ -171,32 +171,22 @@
 </div>
 
 <script>
+      window.vConsole = new VConsole();
+  console.log("✅ vConsole 起動しました");
 
 window.addEventListener('DOMContentLoaded', () => {
-        
-  window.vConsole = new VConsole();
-  console.log("✅ vConsole 起動しました");
-　const params = new URLSearchParams(window.location.search);
-  const siteName = params.get("siteName") || "";
-  const nickname = params.get("nickname") || "";
-  document.getElementById("selectTitle").innerHTML = `${siteName}${nickname}さん、<br>どちらの寄付か選択してください`;
-});
+      const params = new URLSearchParams(window.location.search);
+      const siteName = params.get("siteName") || "";
+      const nickname = params.get("nickname") || "";
+      document.getElementById("selectTitle").innerHTML = `${siteName}${nickname}さん、<br>どちらの寄付か選択してください`;
+    });
 
-    
+    }
 
 let userId, siteName, nickname, imageFileBase64;
 
 // 寄付の種類を保持する（'food' または 'money'）
 let donationType = "";
-
-// URLパラメータから取得
-const params = new URLSearchParams(window.location.search);
-userId = params.get("userId") || "";
-siteName = params.get("siteName") || "";
-nickname = params.get("nickname") || "";
-
-// タイトルを設定
-document.getElementById("title").innerHTML = `${siteName}<br> ${nickname} さん、<br>寄付の報告をしてください`;
 
 
 // 寄付タイプ選択時のフォーム切り替え
