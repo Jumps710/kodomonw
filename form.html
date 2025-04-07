@@ -201,13 +201,16 @@ document.getElementById("title").innerHTML = `${siteName}<br> ${nickname} さん
 
 // 最初の選択画面を非表示にし、フォームを表示
   document.getElementById("selectType").style.display = "none";
-  document.getElementById("donationForm").style.display = "block";
-  document.getElementById("webOpenSection").style.display = "block";
+
 
   if (type === "food") {
+    document.getElementById("donationForm").style.display = "block";
+  　document.getElementById("webOpenSection").style.display = "block";
     document.getElementById("foodFields").style.display = "block";
     document.getElementById("moneyFields").style.display = "none";
 } else {
+    document.getElementById("donationForm").style.display = "block";
+  　document.getElementById("webOpenSection").style.display = "block";
     document.getElementById("foodFields").style.display = "none";
     document.getElementById("moneyFields").style.display = "block";
 }
