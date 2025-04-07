@@ -78,11 +78,27 @@
     }
     .preview-item { margin-bottom: 10px; }
     .preview-item b { display: inline-block; width: 80px; }
+      .input-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .input-wrapper input {
+    flex: 1;
+    padding: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+
+  .input-wrapper .suffix {
+    margin-left: 8px;
+    white-space: nowrap;
+  }
   </style>
 </head>
 <body>
   <div id="selectType" class="button-container">
-    <h2 id="selectTitle" style="text-align: center; margin-bottom: 18px;"></h2>
+    <h3 id="selectTitle" style="text-align: left; margin-bottom: 18px;"></h3>
     <button class="donation-type-button donation-type-food" onclick="selectDonationType('food')">食品</button>
     <button class="donation-type-button donation-type-money" onclick="selectDonationType('money')">金銭</button>
   </div>
@@ -102,10 +118,10 @@
           <input type="text" id="donor" placeholder="※「様」は入力不要です">
           <span class="suffix">様</span>
         </div>
-      </label><br><br>
+      </label>
       <label>メッセージ:<br>
         <textarea id="message" placeholder="寄付の詳細や伝えたいこと（文字数制限なし）"></textarea>
-      </label><br><br>
+      </label>
       <div>
         <input type="file" id="image" hidden>
         <label for="image" class="custom-file-label">画像を選択</label>
@@ -120,7 +136,7 @@
           <input type="text" id="moneyDonor" placeholder="※「様」は入力不要です">
           <span class="suffix">様</span>
         </div>
-      </label><br><br>
+      </label>
       <label>金額:<br>
         <div class="input-wrapper">
           <input type="number" id="amount" placeholder="例：3000">
