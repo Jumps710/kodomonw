@@ -115,17 +115,15 @@
     <div id="foodFields" style="display:none;">
       <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label><br>
       <label>寄付元:<br>
-        <div class="input-wrapper">
           <input type="text" id="donor" placeholder="※「様」は入力不要です">
           <span class="suffix">様</span>
-        </div>
       </label><br>
       <label>メッセージ:<br>
         <textarea id="message" placeholder="寄付の詳細や伝えたいこと（文字数制限なし）"></textarea>
       </label><br>
       <div>
         <input type="file" id="image" hidden>
-        <label for="image" class="custom-file-label">画像を選択</label>
+        <label for="image" class="custom-file-label">画像を選択</label><br>
         <span class="file-name">未選択</span>
       </div>
       <div id="photoPreview"></div>
@@ -186,7 +184,7 @@
       nickname = params.get("nickname") || "";
       userId = params.get("userId") || "";
 
-      document.getElementById("selectTitle").innerHTML = `${siteName}${nickname}さん、<br>どちらの寄付か選択してください`;
+      document.getElementById("selectTitle").innerHTML = `こんにちは！<br>${siteName}${nickname}さん、<br>どちらの寄付か選択してください。`;
     });
 
     function selectDonationType(type) {
