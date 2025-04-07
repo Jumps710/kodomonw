@@ -105,11 +105,11 @@
     </style>
 </head>
 <body>
-    <div id="selectType" class="button-container">
-        <h2 style="text-align: center; margin-bottom: 18px;">どちらの寄付か選択してください</h2>
-        <button class="donation-type-button donation-type-food" onclick="selectDonationType('food')">食品</button>
-        <button class="donation-type-button donation-type-money" onclick="selectDonationType('money')">金銭</button>
-      </div>
+  <div id="selectType" class="button-container">
+    <h2 id="selectTitle" style="text-align: center; margin-bottom: 18px;"></h2>
+    <button class="donation-type-button donation-type-food" onclick="selectDonationType('food')">食品</button>
+    <button class="donation-type-button donation-type-money" onclick="selectDonationType('money')">金銭</button>
+  </div>
 
 <form id="donationForm">
     <h1 id="title"></h1>
@@ -176,8 +176,13 @@ window.addEventListener('DOMContentLoaded', () => {
         
   window.vConsole = new VConsole();
   console.log("✅ vConsole 起動しました");
-  window.selectDonationType = selectDonationType;
+　const params = new URLSearchParams(window.location.search);
+  const siteName = params.get("siteName") || "";
+  const nickname = params.get("nickname") || "";
+  document.getElementById("selectTitle").innerHTML = `${siteName}${nickname}さん、<br>どちらの寄付か選択してください`;
 });
+
+    
 
 let userId, siteName, nickname, imageFileBase64;
 
