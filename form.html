@@ -156,49 +156,48 @@
     <button id="submitDonation">寄付を登録</button>
   </form>
 
-<div id="confirmationModal" class="modal">
+  <div id="confirmationModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3>寄付の報告を送信しますか？</h3>
-        <div class="preview-item"><b>品名:</b> <span id="confirmItem"></span></div>
-        <div class="preview-item"><b>寄付元:</b> <span id="confirmDonor"></span></div>
-        <div class="preview-item"><b>メッセージ:</b> <span id="confirmMessage"></span></div>
-        <div id="confirmImagePreview"></div>
-        <button id="confirmSubmit">確定</button>
-        <div class="loading-msg" id="loadingMsg">お待ちください・・・</div>
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>寄付の報告を送信しますか？</h3>
+      <div class="preview-item"><b>品名:</b> <span id="confirmItem"></span></div>
+      <div class="preview-item"><b>寄付元:</b> <span id="confirmDonor"></span></div>
+      <div class="preview-item"><b>メッセージ:</b> <span id="confirmMessage"></span></div>
+      <div id="confirmImagePreview"></div>
+      <button id="confirmSubmit">確定</button>
+      <div class="loading-msg" id="loadingMsg">お待ちください・・・</div>
     </div>
-</div>
+  </div>
 
-<div id="successModal" class="modal">
+  <div id="successModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeSuccess()">&times;</span>
-        <div style="font-size:20px;font-weight:bold;">✅ 寄付の報告が完了しました！</div>
-        <button onclick="closeSuccess()">OK</button>
+      <span class="close" onclick="closeSuccess()">&times;</span>
+      <div style="font-size:20px;font-weight:bold;">✅ 寄付の報告が完了しました！</div>
+      <button onclick="closeSuccess()">OK</button>
     </div>
-</div>
+  </div>
 
 <script>
     window.vConsole = new VConsole();
     console.log("✅ vConsole 起動しました");
 
-    let userId, siteName, nickname;
+    let userId, siteName, nickname, donationType = "", imageFileBase64 = "";
 
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       siteName = params.get("siteName") || "";
       nickname = params.get("nickname") || "";
+      userId = params.get("userId") || "";
       document.getElementById("selectTitle").innerHTML = `${siteName}${nickname}さん、<br>どちらの寄付か選択してください`;
     });
 
     function selectDonationType(type) {
+      donationType = type;
       document.getElementById("selectType").style.display = "none";
       document.getElementById("donationForm").style.display = "block";
       document.getElementById("foodFields").style.display = (type === 'food') ? "block" : "none";
       document.getElementById("moneyFields").style.display = (type === 'money') ? "block" : "none";
     }
-
-// 寄付の種類を保持する（'food' または 'money'）
-let donationType = "";
 
 // ファイル選択処理
 document.getElementById("image").addEventListener("change", async (e) => {
