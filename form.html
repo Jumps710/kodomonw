@@ -111,43 +111,50 @@
     <button class="donation-type-button donation-type-money" onclick="selectDonationType('money')">金銭</button>
   </div>
 
-<form id="donationForm">
-    <h1 id="title"></h1>
-
+  <form id="donationForm" style="display:none; max-width: 500px; margin: auto;">
     <div id="webOpenSection" style="margin-bottom: 20px;">
-        <label>Webへ公開:<br>
-          <input type="radio" name="open" value="true" checked> する　
-          <input type="radio" name="open" value="false"> しない
-        </label>
-      </div>
-
-    <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label>
-
-    <label>寄付元:</label>
-    <div class="input-wrapper">
-        <input type="text" id="donor" placeholder="※「様」は入力不要です">
-        <span class="suffix">様</span>
+      <label>Webへ公開:<br>
+        <input type="radio" name="open" value="true" checked> する　
+        <input type="radio" name="open" value="false"> しない
+      </label>
     </div>
 
-    <label>メッセージ:
+    <div id="foodFields" style="display:none;">
+      <label>品名:<input type="text" id="itemName" placeholder="お米、缶詰など"></label><br><br>
+      <label>寄付元:<br>
+        <div class="input-wrapper">
+          <input type="text" id="donor" placeholder="※「様」は入力不要です">
+          <span class="suffix">様</span>
+        </div>
+      </label><br><br>
+      <label>メッセージ:<br>
         <textarea id="message" placeholder="寄付の詳細や伝えたいこと（文字数制限なし）"></textarea>
-    </label>
-
-    <div>
+      </label><br><br>
+      <div>
         <input type="file" id="image" hidden>
         <label for="image" class="custom-file-label">画像を選択</label>
         <span class="file-name">未選択</span>
+      </div>
+      <div id="photoPreview"></div>
     </div>
 
-    <div id="photoPreview"></div>
-
-    <div id="moneyFields" style="display:none">
-        <label class="input-wrapper">寄付元:<input type="text" id="moneyDonor" placeholder="※「様」は入力不要です"><span class="suffix">様</span></label><br><br>
-        <label class="input-wrapper">金額:<input type="number" id="amount" placeholder="例：3000"><span class="suffix">円</span></label>
-      </div>
+    <div id="moneyFields" style="display:none;">
+      <label>寄付元:<br>
+        <div class="input-wrapper">
+          <input type="text" id="moneyDonor" placeholder="※「様」は入力不要です">
+          <span class="suffix">様</span>
+        </div>
+      </label><br><br>
+      <label>金額:<br>
+        <div class="input-wrapper">
+          <input type="number" id="amount" placeholder="例：3000">
+          <span class="suffix">円</span>
+        </div>
+      </label>
+    </div>
 
     <button id="submitDonation">寄付を登録</button>
-</form>
+  </form>
 
 <div id="confirmationModal" class="modal">
     <div class="modal-content">
@@ -171,45 +178,27 @@
 </div>
 
 <script>
-      window.vConsole = new VConsole();
-  console.log("✅ vConsole 起動しました");
+    window.vConsole = new VConsole();
+    console.log("✅ vConsole 起動しました");
 
-window.addEventListener('DOMContentLoaded', () => {
+    let userId, siteName, nickname;
+
+    window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
-      const siteName = params.get("siteName") || "";
-      const nickname = params.get("nickname") || "";
+      siteName = params.get("siteName") || "";
+      nickname = params.get("nickname") || "";
       document.getElementById("selectTitle").innerHTML = `${siteName}${nickname}さん、<br>どちらの寄付か選択してください`;
     });
 
+    function selectDonationType(type) {
+      document.getElementById("selectType").style.display = "none";
+      document.getElementById("donationForm").style.display = "block";
+      document.getElementById("foodFields").style.display = (type === 'food') ? "block" : "none";
+      document.getElementById("moneyFields").style.display = (type === 'money') ? "block" : "none";
     }
-
-let userId, siteName, nickname, imageFileBase64;
 
 // 寄付の種類を保持する（'food' または 'money'）
 let donationType = "";
-
-
-// 寄付タイプ選択時のフォーム切り替え
-    function selectDonationType(type) {
-// 選択された寄付タイプを保存
-  donationType = type;
-
-// 最初の選択画面を非表示にし、フォームを表示
-  document.getElementById("selectType").style.display = "none";
-
-
-  if (type === "food") {
-    document.getElementById("donationForm").style.display = "block";
-  　document.getElementById("webOpenSection").style.display = "block";
-    document.getElementById("foodFields").style.display = "block";
-    document.getElementById("moneyFields").style.display = "none";
-} else {
-    document.getElementById("donationForm").style.display = "block";
-  　document.getElementById("webOpenSection").style.display = "block";
-    document.getElementById("foodFields").style.display = "none";
-    document.getElementById("moneyFields").style.display = "block";
-}
-    }
 
 // ファイル選択処理
 document.getElementById("image").addEventListener("change", async (e) => {
