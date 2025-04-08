@@ -83,29 +83,31 @@
     align-items: center;
   }
 
-.input-wrapper input {
-  height: 40px;
-  padding: 6px 10px;
-  font-size: 18px;
-  box-sizing: border-box;
-  width: 100%;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  appearance: none;
-  -moz-appearance: textfield; /* Firefox対策 */
-}
-
-.input-wrapper input::-webkit-outer-spin-button,
-.input-wrapper input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-  .input-wrapper .suffix {
-    margin-left: 8px;
-    white-space: nowrap;
-  }
+   .input-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    .input-wrapper input {
+      height: 40px;
+      padding: 12px 12px;
+      font-size: 18px;
+      box-sizing: border-box;
+      width: 100%;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      appearance: none;
+      -moz-appearance: textfield;
+    }
+    .input-wrapper input::-webkit-outer-spin-button,
+    .input-wrapper input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .input-wrapper .suffix {
+      margin-left: 8px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -163,11 +165,11 @@
       <span class="close" onclick="closeModal()">&times;</span>
       <h3>寄付の報告を送信しますか？</h3>
       <div class="preview-item"><b>公開設定:</b> <span id="confirmWebOpen"></span></div>
-      <div class="preview-item"><b>品名:</b> <span id="confirmItem"></span></div>
+      <div class="preview-item" id="previewItem" style="display:none;"><b>品名:</b> <span id="confirmItem"></span></div>
       <div class="preview-item"><b>寄付元:</b> <span id="confirmDonor"></span></div>
-      <div class="preview-item"><b>メッセージ:</b> <span id="confirmMessage"></span></div>
+    <div class="preview-item" id="previewMessage" style="display:none;"><b>メッセージ:</b> <span id="confirmMessage"></span></div>
       <div id="confirmImagePreview"></div>
-      <div class="preview-item"><b>金額:</b> <span id="confirmAmount"></span></div>
+ <div class="preview-item" id="previewAmount" style="display:none;"><b>金額:</b> <span id="confirmAmount"></span></div>
       <button id="confirmSubmit">確定</button>
       <div class="loading-msg" id="loadingMsg">お待ちください・・・</div>
     </div>
@@ -254,12 +256,21 @@
         document.getElementById("confirmMessage").textContent = document.getElementById("message").value;
         document.getElementById("confirmImagePreview").innerHTML = imageFileBase64 ? `<img src="data:image/jpeg;base64,${imageFileBase64}" width="150">` : "";
         document.getElementById("confirmAmount").textContent = "";
+
+        document.getElementById("previewItem").style.display = "block";
+        document.getElementById("previewMessage").style.display = "block";
+        document.getElementById("previewAmount").style.display = "none";
+        
       } else {
         document.getElementById("confirmItem").textContent = "";
         document.getElementById("confirmDonor").textContent = document.getElementById("moneyDonor").value + " 様";
         document.getElementById("confirmMessage").textContent = "";
         document.getElementById("confirmImagePreview").innerHTML = "";
         document.getElementById("confirmAmount").textContent = document.getElementById("amount").value + " 円";
+
+        document.getElementById("previewItem").style.display = "none";
+        document.getElementById("previewMessage").style.display = "none";
+        document.getElementById("previewAmount").style.display = "block";
       }
       document.getElementById("confirmationModal").style.display = "flex";
     });
